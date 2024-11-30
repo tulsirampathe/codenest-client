@@ -49,8 +49,9 @@ const HomeNavbar = () => {
   });
 
   const handleLogout = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
+<<<<<<< HEAD
     try {
       const { data } = await userLogout(); // Call the logout mutation
 
@@ -63,6 +64,34 @@ const HomeNavbar = () => {
       console.error(err);
     }
   };
+=======
+  // Show a loading toast and capture the toast ID
+  const loadingToastId = toast.loading("Logging out...");
+
+  try {
+    const { data } = await axios.post(`${server}/user/logout`, {}, config);
+
+    // Update the toast with the success message and auto-close after 3 seconds
+    toast.update(loadingToastId, {
+      render: data.message,
+      type: "success",
+      isLoading: false,
+      autoClose: 3000, // auto-close after 3 seconds
+    });
+    
+    dispatch(userNotExists());
+  } catch (error) {
+    // Update the toast with the error message and auto-close after 3 seconds
+    toast.update(loadingToastId, {
+      render: error?.response?.data?.message || "Something went wrong",
+      type: "error",
+      isLoading: false,
+      autoClose: 3000, // auto-close after 3 seconds
+    });
+  }
+};
+
+>>>>>>> a182cc025bde2e9443cd46b7d46baf455d2e3acf
 
   return (
     <nav className="bg-gradient-to-r from-teal-400 via-cyan-500 to-blue-600 shadow-md w-full top-0 overflow-visible">
