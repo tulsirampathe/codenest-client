@@ -170,4 +170,3 @@ const ChallengeHeader = ({
 export default ChallengeHeader;
 
 
-export default ChallengeHeader;
