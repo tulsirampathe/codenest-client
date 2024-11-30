@@ -18,9 +18,19 @@ const ChallengeHeader = ({
   handleCopy,
   copied,
 }) => {
-    
-  const formatDate = (date) => {
-    return new Date(date).toISOString().slice(0, 16);
+
+  // Reusable function to format dates and times
+  const formatDateTime = (date) => {
+    const dateObj = new Date(date);
+    return dateObj.toLocaleString(undefined, {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
   };
 
   return (
@@ -45,14 +55,14 @@ const ChallengeHeader = ({
           <input
             type="datetime-local"
             name="startTime"
-            defaultValue={formatDate(challengeData.startTime)}
+            defaultValue={formatDateTime(challengeData.startTime)}
             className="w-full border border-gray-300 rounded-md p-2 mb-2 transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           />
           <input
             type="datetime-local"
             name="endTime"
-            defaultValue={formatDate(challengeData.endTime)}
+            defaultValue={formatDateTime(challengeData.endTime)}
             className="w-full border border-gray-300 rounded-md p-2 mb-4 transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           />
@@ -78,7 +88,7 @@ const ChallengeHeader = ({
             {challengeData.description}
           </p>
 
-          {/* Start and End Date with Improved Design */}
+          {/* Start and End Date with Consistent Time Format */}
           <div className="flex flex-col sm:flex-row justify-center gap-8 text-sm text-gray-800 mb-6">
             <div className="flex flex-col items-start bg-gradient-to-r from-indigo-200 to-indigo-300 text-indigo-800 py-4 px-6 rounded-lg font-semibold shadow-md w-full sm:w-auto max-w-xs transition duration-300 transform hover:scale-105">
               <div className="flex items-center gap-2 mb-2">
@@ -86,24 +96,7 @@ const ChallengeHeader = ({
                 <span className="font-bold text-indigo-700">Start Date:</span>
               </div>
               <span className="text-gray-700">
-                {new Date(challengeData.startTime).toLocaleDateString(
-                  undefined,
-                  {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  }
-                )}
-              </span>
-              <span className="text-gray-600">
-                {new Date(challengeData.startTime).toLocaleTimeString(
-                  undefined,
-                  {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                  }
-                )}
+                {formatDateTime(challengeData.startTime)}
               </span>
             </div>
 
@@ -113,18 +106,7 @@ const ChallengeHeader = ({
                 <span className="font-bold text-indigo-700">End Date:</span>
               </div>
               <span className="text-gray-700">
-                {new Date(challengeData.endTime).toLocaleDateString(undefined, {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </span>
-              <span className="text-gray-600">
-                {new Date(challengeData.endTime).toLocaleTimeString(undefined, {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true,
-                })}
+                {formatDateTime(challengeData.endTime)}
               </span>
             </div>
           </div>
@@ -184,5 +166,8 @@ const ChallengeHeader = ({
     </header>
   );
 };
+
+export default ChallengeHeader;
+
 
 export default ChallengeHeader;

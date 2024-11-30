@@ -52,13 +52,6 @@ function ChallengeTimer({
     onChallengeStatusChange,
   ]);
 
-  const gradingMessage = (score) => {
-    if (score >= 90) return "Outstanding Performance!";
-    if (score >= 75) return "Great Job!";
-    if (score >= 50) return "Good Effort!";
-    return "Keep Practicing!";
-  };
-
   return (
     <div className="flex flex-col items-center justify-center space-y-6 p-6 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 shadow-md rounded-lg border border-gray-600 w-full max-w-lg mx-auto mt-10 transition duration-300 transform hover:scale-105 hover:shadow-2xl hover:bg-opacity-90 relative">
       {/* Pattern overlay */}
@@ -71,10 +64,6 @@ function ChallengeTimer({
             <FaTimesCircle className="text-red-500 text-6xl mb-4 animate-bounce" />
             <h2 className="text-2xl font-bold text-red-600">Challenge Ended</h2>
             <p className="text-gray-300 mt-3">Thanks for participating!</p>
-            <p className="text-gray-300 mt-3">Your Score: {participantScore}</p>
-            <p className="text-gray-300 mt-3">
-              {gradingMessage(participantScore)}
-            </p>
           </div>
         ) : !hasStarted ? (
           <div className="text-center animate-fade-in">
