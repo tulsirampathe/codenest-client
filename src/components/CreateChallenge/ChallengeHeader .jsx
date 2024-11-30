@@ -18,14 +18,26 @@ const ChallengeHeader = ({
   handleCopy,
   copied,
 }) => {
-  // Reusable function to format dates and times
-  const formatDateTime = (date) => {
+  // Function to format date and time for display (e.g., "1 December 2024, 14:30")
+  const formatDisplayDateTime = (date) => {
+    return new Date(date).toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Function to format date and time for input field (e.g., "2024-12-01T14:30")
+  const formatInputDateTime = (date) => {
     const d = new Date(date);
     const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
@@ -51,14 +63,14 @@ const ChallengeHeader = ({
           <input
             type="datetime-local"
             name="startTime"
-            defaultValue={formatDateTime(challengeData.startTime)}
+            defaultValue={formatInputDateTime(challengeData.startTime)}  // Set value for input
             className="w-full border border-gray-300 rounded-md p-2 mb-2 transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           />
           <input
             type="datetime-local"
             name="endTime"
-            defaultValue={formatDateTime(challengeData.endTime)}
+            defaultValue={formatInputDateTime(challengeData.endTime)}  // Set value for input
             className="w-full border border-gray-300 rounded-md p-2 mb-4 transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           />
@@ -92,7 +104,7 @@ const ChallengeHeader = ({
                 <span className="font-bold text-indigo-700">Start Date:</span>
               </div>
               <span className="text-gray-700">
-                {formatDateTime(challengeData.startTime)}
+                {formatDisplayDateTime(challengeData.startTime)}  {/* Display formatted date */}
               </span>
             </div>
 
@@ -102,7 +114,7 @@ const ChallengeHeader = ({
                 <span className="font-bold text-indigo-700">End Date:</span>
               </div>
               <span className="text-gray-700">
-                {formatDateTime(challengeData.endTime)}
+                {formatDisplayDateTime(challengeData.endTime)}  {/* Display formatted date */}
               </span>
             </div>
           </div>
@@ -164,3 +176,4 @@ const ChallengeHeader = ({
 };
 
 export default ChallengeHeader;
+
