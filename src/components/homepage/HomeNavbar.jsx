@@ -36,7 +36,7 @@ const HomeNavbar = () => {
     e.preventDefault();
 
     try {
-      const { data } = await axios.get(`${server}/user/logout`, config);
+      const { data } = await axios.post(`${server}/user/logout`, config);
 
       if (data.success) {
         dispatch(userNotExists());

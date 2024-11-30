@@ -17,7 +17,7 @@ function HostNavbar() {
     e.preventDefault();
 
     try {
-      const { data } = await axios.get(`${server}/admin/logout`, config);
+      const { data } = await axios.post(`${server}/admin/logout`, config);
 
       if (data.success) {
         dispatch(hostNotExists());
