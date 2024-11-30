@@ -1,5 +1,6 @@
 // HostNavbar.js
 import React from "react";
+import toast from "react-hot-toast";
 import { FaHome, FaSignOutAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -30,15 +31,15 @@ function HostNavbar() {
     e.preventDefault();
 
     try {
-      const { data } = await hostLogout(); // Call the logout mutation
+      const { data } = await hostLogout();
 
-      if (data?.success) {
+      if (isSuccess) {
         dispatch(hostNotExists());
       } else {
-        throw new Error(data?.message || "Something Went Wrong");
+        throw new Error(data.message);
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something Went Wrong");
     }
   };
 

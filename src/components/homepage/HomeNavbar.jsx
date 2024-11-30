@@ -51,7 +51,7 @@ const HomeNavbar = () => {
     try {
       const { data } = await userLogout(); // Call the logout mutation
 
-      if (data?.success) {
+      if (isSuccess) {
         dispatch(userNotExists());
       } else {
         throw new Error(data?.message || "Something Went Wrong");
