@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useMutationToast from "../../hooks/useMutationToast";
 import { useUserLogoutMutation } from "../../redux/api/api";
 import { userNotExists } from "../../redux/reducers/auth";
@@ -10,6 +10,8 @@ const HomeNavbar = () => {
   const { user } = useSelector((state) => state.auth);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
@@ -46,13 +48,14 @@ const HomeNavbar = () => {
   });
 
   const handleLogout = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
     try {
       const { data } = await userLogout(); // Call the logout mutation
 
       if (isSuccess) {
         dispatch(userNotExists());
+        navigate("/");
       } else {
         throw new Error(data?.message || "Something Went Wrong");
       }

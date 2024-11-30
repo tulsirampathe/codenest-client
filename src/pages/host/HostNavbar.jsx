@@ -35,6 +35,7 @@ function HostNavbar() {
 
       if (isSuccess) {
         dispatch(hostNotExists());
+        navigate("/")
       } else {
         throw new Error(data.message);
       }
