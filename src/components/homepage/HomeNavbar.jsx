@@ -35,17 +35,31 @@ const HomeNavbar = () => {
   const handleLogout = async (e) => {
     e.preventDefault();
 
+    // Show a loading toast
+    const loadingToastId = toast.loading("Logging out...");
+
     try {
       const { data } = await axios.post(`${server}/user/logout`, {}, config);
 
       if (data.success) {
         dispatch(userNotExists());
-        toast.success(data.message);
+        toast.update(loadingToastId, {
+          render: data.message,
+          type: "success",
+          isLoading: false,
+          autoClose: 3000, // auto-close after 3 seconds
+        });
       } else {
         throw new Error(data.message);
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Something Went Wrong");
+      // Update the toast to display the error message
+      toast.update(loadingToastId, {
+        render: error?.response?.data?.message || "Something went wrong",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000, // auto-close after 3 seconds
+      });
     }
   };
 

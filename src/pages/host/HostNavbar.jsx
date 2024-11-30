@@ -16,19 +16,34 @@ function HostNavbar() {
   const handleLogout = async (e) => {
     e.preventDefault();
   
+    // Show a loading toast
+    const loadingToastId = toast.loading("Logging out...");
+  
     try {
       const { data } = await axios.post(`${server}/admin/logout`, {}, config); // Ensure an empty body is sent
+  
       if (data.success) {
         dispatch(hostNotExists());
-        toast.success(data.message);
+        toast.update(loadingToastId, {
+          render: data.message,
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
       } else {
         throw new Error(data.message);
       }
     } catch (error) {
-      console.error("Logout Error:", error?.response?.data || error.message);
-      toast.error(error?.response?.data?.message || "Something went wrong");
+      // Update the toast to display the error message
+      toast.update(loadingToastId, {
+        render: error?.response?.data?.message || "Something went wrong",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
     }
   };
+  
   
   return (
     <nav className="bg-indigo-600 text-white shadow-md">
