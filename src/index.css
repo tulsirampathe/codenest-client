@@ -74,7 +74,8 @@
   left: 75%;
   animation-duration: 5s;
 }
-// CSS Animations
+
+/* CSS Animations */
 @keyframes spin-slow {
   0% {
     transform: rotate(0deg);
