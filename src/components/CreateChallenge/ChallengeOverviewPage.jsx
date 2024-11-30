@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  FaPlus
-} from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useMutationToast from "../../hooks/useMutationToast";
@@ -33,9 +31,8 @@ function ChallengeOverviewPage() {
   const [testCases, setTestCases] = useState([]);
   const [copied, setCopied] = useState(false);
   const [question, setQuestion] = useState("");
-  
+
   const { challengeID } = useSelector((state) => state.auth);
-  
 
   const { data, isLoading: isChallengeLoading } =
     useChallengeDataQuery(challengeID);
@@ -106,14 +103,20 @@ function ChallengeOverviewPage() {
     setShowTestCasePanel(!showTestCasePanel);
   };
 
+  // Function to handle time conversion to UTC
+  const convertToUTC = (localDateTime) => {
+    const date = new Date(localDateTime);
+    return date.toISOString(); // Converts to ISO string in UTC format
+  };
+
   // Handle challenge data editing
   const handleEditChallengeData = async (e) => {
     e.preventDefault();
     const updatedChallengeData = {
       title: e.target.title.value,
       description: e.target.description.value,
-      startTime: e.target.startTime.value,
-      endTime: e.target.endTime.value,
+      startTime: convertToUTC(e.target.startTime.value),
+      endTime: convertToUTC(e.target.endTime.value),
     };
     await editChallenge({ id: challengeID, data: updatedChallengeData });
   };
@@ -154,7 +157,6 @@ function ChallengeOverviewPage() {
 
         {/* Leaderboard and Participation Panel */}
         <LeaderboardOrParticipationPanel
-
           isChallengeLoading={isChallengeLoading}
           challengeData={challengeData}
         />
