@@ -51,9 +51,9 @@ const HomeNavbar = () => {
     e.preventDefault();
 
     try {
-      const { data } = await userLogout(); // Call the logout mutation
+      await userLogout(); // Call the logout mutation
 
-      if (isSuccess) {
+      if (data?.success) {
         dispatch(userNotExists());
         navigate("/");
       } else {

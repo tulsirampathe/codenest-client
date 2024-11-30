@@ -31,9 +31,9 @@ function HostNavbar() {
     e.preventDefault();
 
     try {
-      const { data } = await hostLogout();
+      await hostLogout();
 
-      if (isSuccess) {
+      if (data?.success) {
         dispatch(hostNotExists());
       } else {
         throw new Error(data.message);
