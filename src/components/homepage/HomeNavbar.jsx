@@ -1,17 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
-import { FaUserCircle } from "react-icons/fa";
+import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import useMutationToast from "../../hooks/useMutationToast";
-import { useUserLogoutMutation } from "../../redux/api/api";
+import { Link } from "react-router-dom";
+import { FaUserCircle } from "react-icons/fa";
+import axios from "axios";
+import { config, server } from "../../constants/config";
 import { userNotExists } from "../../redux/reducers/auth";
+import toast from "react-hot-toast";
 
 const HomeNavbar = () => {
   const { user } = useSelector((state) => state.auth);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-
-  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
@@ -33,34 +32,20 @@ const HomeNavbar = () => {
     };
   }, []);
 
-  const [userLogout, { isLoading, isSuccess, data, isError, error }] =
-    useUserLogoutMutation();
-
-  // Use the useMutationToast hook to handle toast messages
-  useMutationToast({
-    isLoading,
-    isSuccess,
-    data,
-    isError,
-    error,
-    loadingMessage: "Logging out...",
-    successMessage: "You have logged out successfully.",
-  });
-
   const handleLogout = async (e) => {
     e.preventDefault();
 
     try {
-      await userLogout(); // Call the logout mutation
+      const { data } = await axios.post(`${server}/user/logout`, {}, config);
 
-      if (data?.success) {
+      if (data.success) {
         dispatch(userNotExists());
-        navigate("/");
+        toast.success(data.message);
       } else {
-        throw new Error(data?.message || "Something Went Wrong");
+        throw new Error(data.message);
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something Went Wrong");
     }
   };
 

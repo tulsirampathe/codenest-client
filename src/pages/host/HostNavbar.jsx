@@ -1,11 +1,11 @@
 // HostNavbar.js
+import axios from "axios";
 import React from "react";
 import toast from "react-hot-toast";
 import { FaHome, FaSignOutAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import useMutationToast from "../../hooks/useMutationToast";
-import { useHostLogoutMutation } from "../../redux/api/api";
+import { config, server } from "../../constants/config";
 import { hostNotExists } from "../../redux/reducers/auth";
 
 function HostNavbar() {
@@ -13,28 +13,15 @@ function HostNavbar() {
 
   const dispatch = useDispatch();
 
-  const [hostLogout, { isLoading, isSuccess, data, isError, error }] =
-    useHostLogoutMutation();
-
-  // Use the useMutationToast hook to handle toast messages
-  useMutationToast({
-    isLoading,
-    isSuccess,
-    data,
-    isError,
-    error,
-    loadingMessage: "Logging out...",
-    successMessage: "You have logged out successfully.",
-  });
-
   const handleLogout = async (e) => {
     e.preventDefault();
 
     try {
-      await hostLogout();
+      const { data } = await axios.post(`${server}/admin/logout`, {}, config);
 
-      if (data?.success) {
+      if (data.success) {
         dispatch(hostNotExists());
+        toast.success(data.message);
       } else {
         throw new Error(data.message);
       }
