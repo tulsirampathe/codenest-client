@@ -1,9 +1,8 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { FaTimes } from "react-icons/fa";
-import { useCreateChallengeMutation } from "../../redux/api/api";
 import useMutationToast from "../../hooks/useMutationToast";
+import { useCreateChallengeMutation } from "../../redux/api/api";
 
 function ChallengeSetup({ onClose }) {
   const [title, setTitle] = useState("");
@@ -29,12 +28,19 @@ function ChallengeSetup({ onClose }) {
     }
   }, [createStatus.isSuccess, onClose]);
 
+  // Function to handle time conversion to UTC
+  const convertToUTC = (localDateTime) => {
+    const date = new Date(localDateTime);
+    return date.toISOString(); // Converts to ISO string in UTC format
+  };
+
   const handleCreateChallenge = async () => {
+    // Convert times to UTC before sending
     const data = {
       title,
       description,
-      startTime,
-      endTime,
+      startTime: convertToUTC(startTime),
+      endTime: convertToUTC(endTime),
     };
     await createChallenge(data).unwrap(); // Unwrap to directly get the result
   };
