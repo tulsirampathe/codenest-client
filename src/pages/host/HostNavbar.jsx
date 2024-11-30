@@ -1,14 +1,11 @@
 // HostNavbar.js
-import axios from "axios";
 import React from "react";
-import toast from "react-hot-toast";
 import { FaHome, FaSignOutAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { config, server } from "../../constants/config";
+import useMutationToast from "../../hooks/useMutationToast";
 import { useHostLogoutMutation } from "../../redux/api/api";
 import { hostNotExists } from "../../redux/reducers/auth";
-import useMutationToast from "../../hooks/useMutationToast";
 
 function HostNavbar() {
   const navigate = useNavigate();
