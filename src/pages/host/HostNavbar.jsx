@@ -6,45 +6,45 @@ import { FaHome, FaSignOutAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { config, server } from "../../constants/config";
+import { useHostLogoutMutation } from "../../redux/api/api";
 import { hostNotExists } from "../../redux/reducers/auth";
+import useMutationToast from "../../hooks/useMutationToast";
 
 function HostNavbar() {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
+  const [hostLogout, { isLoading, isSuccess, data, isError, error }] =
+    useHostLogoutMutation();
+
+  // Use the useMutationToast hook to handle toast messages
+  useMutationToast({
+    isLoading,
+    isSuccess,
+    data,
+    isError,
+    error,
+    loadingMessage: "Logging out...",
+    successMessage: "You have logged out successfully.",
+  });
+
   const handleLogout = async (e) => {
     e.preventDefault();
-  
-    // Show a loading toast
-    const loadingToastId = toast.loading("Logging out...");
-  
+
     try {
-      const { data } = await axios.post(`${server}/admin/logout`, {}, config); // Ensure an empty body is sent
-  
-      if (data.success) {
+      const { data } = await hostLogout(); // Call the logout mutation
+
+      if (data?.success) {
         dispatch(hostNotExists());
-        toast.update(loadingToastId, {
-          render: data.message,
-          type: "success",
-          isLoading: false,
-          autoClose: 3000,
-        });
       } else {
-        throw new Error(data.message);
+        throw new Error(data?.message || "Something Went Wrong");
       }
-    } catch (error) {
-      // Update the toast to display the error message
-      toast.update(loadingToastId, {
-        render: error?.response?.data?.message || "Something went wrong",
-        type: "error",
-        isLoading: false,
-        autoClose: 3000,
-      });
+    } catch (err) {
+      console.error(err);
     }
   };
-  
-  
+
   return (
     <nav className="bg-indigo-600 text-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

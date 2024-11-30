@@ -28,6 +28,24 @@ const api = createApi({
       }),
     }),
 
+    userLogout: builder.mutation({
+      query: () => ({
+        url: "/user/logout",
+        method: "POST",
+        body: {},
+        credentials: "include",
+      }),
+    }),
+
+    hostLogout: builder.mutation({
+      query: () => ({
+        url: "/admin/logout",
+        method: "POST",
+        body: {},
+        credentials: "include",
+      }),
+    }),
+
     // Get list of challenges
     myChallenges: builder.query({
       query: () => ({
@@ -262,4 +280,6 @@ export const {
   useGetProgressQuery,
   useCalculateLeaderboardMutation,
   useGetLeaderboardQuery,
+  useUserLogoutMutation,
+  useHostLogoutMutation,
 } = api;

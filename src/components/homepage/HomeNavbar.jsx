@@ -6,6 +6,8 @@ import axios from "axios";
 import { config, server } from "../../constants/config";
 import { userNotExists } from "../../redux/reducers/auth";
 import toast from "react-hot-toast";
+import useMutationToast from "../../hooks/useMutationToast";
+import { useUserLogoutMutation } from "../../redux/api/api";
 
 const HomeNavbar = () => {
   const { user } = useSelector((state) => state.auth);
@@ -32,34 +34,33 @@ const HomeNavbar = () => {
     };
   }, []);
 
+  const [userLogout, { isLoading, isSuccess, data, isError, error }] =
+    useUserLogoutMutation();
+
+  // Use the useMutationToast hook to handle toast messages
+  useMutationToast({
+    isLoading,
+    isSuccess,
+    data,
+    isError,
+    error,
+    loadingMessage: "Logging out...",
+    successMessage: "You have logged out successfully.",
+  });
+
   const handleLogout = async (e) => {
     e.preventDefault();
 
-    // Show a loading toast
-    const loadingToastId = toast.loading("Logging out...");
-
     try {
-      const { data } = await axios.post(`${server}/user/logout`, {}, config);
+      const { data } = await userLogout(); // Call the logout mutation
 
-      if (data.success) {
+      if (data?.success) {
         dispatch(userNotExists());
-        toast.update(loadingToastId, {
-          render: data.message,
-          type: "success",
-          isLoading: false,
-          autoClose: 3000, // auto-close after 3 seconds
-        });
       } else {
-        throw new Error(data.message);
+        throw new Error(data?.message || "Something Went Wrong");
       }
-    } catch (error) {
-      // Update the toast to display the error message
-      toast.update(loadingToastId, {
-        render: error?.response?.data?.message || "Something went wrong",
-        type: "error",
-        isLoading: false,
-        autoClose: 3000, // auto-close after 3 seconds
-      });
+    } catch (err) {
+      console.error(err);
     }
   };
 
