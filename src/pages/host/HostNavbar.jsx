@@ -15,10 +15,9 @@ function HostNavbar() {
 
   const handleLogout = async (e) => {
     e.preventDefault();
-
+  
     try {
-      const { data } = await axios.post(`${server}/admin/logout`, config);
-
+      const { data } = await axios.post(`${server}/admin/logout`, {}, config); // Ensure an empty body is sent
       if (data.success) {
         dispatch(hostNotExists());
         toast.success(data.message);
@@ -26,10 +25,11 @@ function HostNavbar() {
         throw new Error(data.message);
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Something Went Wrong");
+      console.error("Logout Error:", error?.response?.data || error.message);
+      toast.error(error?.response?.data?.message || "Something went wrong");
     }
   };
-
+  
   return (
     <nav className="bg-indigo-600 text-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
