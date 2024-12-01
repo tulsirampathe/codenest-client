@@ -76,7 +76,7 @@ const HomeNavbar = () => {
           </li>
         </ul>
 
-        {user ? (
+        {user && (
           <div
             className="relative flex items-center space-x-4"
             ref={dropdownRef}
@@ -113,21 +113,6 @@ const HomeNavbar = () => {
                 </button>
               </div>
             )}
-          </div>
-        ) : (
-          <div className="flex space-x-6">
-            <Link
-              to="/host-login"
-              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Host Log In
-            </Link>
-            <Link
-              to="/user-login"
-              className="px-6 py-3 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
-            >
-              User Log In
-            </Link>
           </div>
         )}
       </div>

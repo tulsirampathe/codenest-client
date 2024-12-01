@@ -1,16 +1,13 @@
-// src/components/Footer.jsx
 import React from "react";
-// Import Font Awesome Icons
 import { FaFacebookF, FaTwitter, FaLinkedinIn } from "react-icons/fa";
 
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-10">
       <div className="container mx-auto px-6">
-        {/* Footer Content Container */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Logo and Description */}
-          <div className="mb-6 md:mb-0">
+          <div>
             <h1 className="text-3xl font-bold text-yellow-400">Codenest</h1>
             <p className="text-sm mt-3">
               Codenest is a cutting-edge online platform designed to enhance
@@ -23,10 +20,8 @@ const Footer = () => {
           </div>
 
           {/* Navigation Links */}
-          <div className="mb-6 md:mb-0">
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Quick Links
-            </h2>
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Quick Links</h2>
             <nav className="flex flex-col space-y-3">
               <a href="#home" className="text-sm hover:underline">
                 Home
@@ -47,10 +42,8 @@ const Footer = () => {
           </div>
 
           {/* Contact Information */}
-          <div className="mb-6 md:mb-0">
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Contact Us
-            </h2>
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Contact Us</h2>
             <p className="text-sm mb-4">
               Feel free to reach out for support or inquiries. We are always
               here to help!
@@ -88,10 +81,12 @@ const Footer = () => {
             Get the latest updates on coding resources, new courses, and more.
             Join our community today!
           </p>
-
-          {/* Add gap-4 to create space between input and button */}
           <div className="flex flex-col md:flex-row items-center md:gap-4">
+            <label htmlFor="email" className="sr-only">
+              Email
+            </label>
             <input
+              id="email"
               type="email"
               className="bg-gray-700 text-white px-4 py-2 rounded-md mb-4 md:mb-0 md:w-2/3"
               placeholder="Enter your email"
@@ -105,42 +100,39 @@ const Footer = () => {
         {/* Footer Bottom */}
         <div className="mt-12 border-t border-gray-700 pt-6">
           <div className="flex justify-between items-center">
-            {/* Social Media Links */}
             <div className="flex space-x-6">
               <a
-                href="https://github.com/ramraja1"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white"
               >
                 <FaFacebookF />
               </a>
               <a
-                href="https://www.geeksforgeeks.org/user/ramtiwaz8jh/"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white"
               >
                 <FaTwitter />
               </a>
               <a
-                href="https://www.linkedin.com/in/pawan-tiwari-922284246"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white"
               >
                 <FaLinkedinIn />
               </a>
             </div>
-
-            {/* Copyright */}
             <div className="text-center text-gray-500 text-sm">
               © 2024 Codenest. All Rights Reserved. <br />
-              <a
-                href="#privacy"
-                className="text-sm text-gray-400 hover:underline"
-              >
+              <a href="#privacy" className="text-gray-400 hover:underline">
                 Privacy Policy
               </a>{" "}
               |{" "}
-              <a
-                href="#terms"
-                className="text-sm text-gray-400 hover:underline"
-              >
+              <a href="#terms" className="text-gray-400 hover:underline">
                 Terms of Service
               </a>
             </div>

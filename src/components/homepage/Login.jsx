@@ -1,29 +1,13 @@
 /* eslint-disable react/prop-types */
-import axios from "axios";
 import React, { useState } from "react";
+import axios from "axios";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { hostExists, userExists } from "../../redux/reducers/auth";
 
-// Helper function for validation
-const validateForm = (data) => {
-  const errors = {};
-  if (!data.username) errors.username = "Username is required.";
-  if (!data.email) errors.email = "Email is required.";
-  else if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(data.email)) {
-    errors.email =
-      "Email must be a valid Gmail address (e.g., example@gmail.com).";
-  }
-  if (!data.password) errors.password = "Password is required.";
-  else if (data.password.length < 6)
-    errors.password = "Password must be at least 6 characters.";
-  return errors;
-};
-
-const Signup = ({ userType, onSubmit, toggleForm }) => {
+const Login = ({ userType, onSubmit, toggleForm }) => {
   const [formData, setFormData] = useState({
-    username: "",
     email: "",
     password: "",
   });
@@ -41,20 +25,26 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.email) newErrors.email = "Email is required.";
+    else if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(formData.email)) {
+      newErrors.email =
+        "Email must be a valid Gmail address (e.g., example@gmail.com).";
+    }
+
+    if (!formData.password) newErrors.password = "Password is required.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate form data
-    const validationErrors = validateForm(formData);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
+    if (!validate()) return;
 
-    setIsLoading(true);
-
-    const endpoint =
-      userType === "Admin" ? "/admin/register" : "/user/register";
+    setIsLoading(true); // Show loader while processing
+    const endpoint = userType === "Admin" ? "/admin/login" : "/user/login";
 
     try {
       const { data } = await axios.post(
@@ -80,10 +70,10 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
       }
     } catch (error) {
       toast.error(
-        error?.response?.data?.message || "Signup failed. Please try again."
+        error?.response?.data?.message || "Login failed. Please try again."
       );
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Hide loader after response
     }
   };
 
@@ -93,30 +83,6 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md"
       >
-        {/* Username Input */}
-        <div className="mb-4">
-          <label
-            htmlFor="username"
-            className="block text-gray-700 font-medium mb-1"
-          >
-            Username
-          </label>
-          <input
-            type="text"
-            name="username"
-            id="username"
-            value={formData.username}
-            onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg ${
-              errors.username ? "border-red-500" : "border-gray-300"
-            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-            placeholder="Enter username"
-          />
-          {errors.username && (
-            <p className="text-red-500 text-sm mt-1">{errors.username}</p>
-          )}
-        </div>
-
         {/* Email Input */}
         <div className="mb-4">
           <label
@@ -168,24 +134,24 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-green-600 text-white font-bold py-2 rounded-lg hover:bg-green-700 transition"
+          className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition"
           disabled={isLoading}
         >
           {isLoading ? (
             <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           ) : (
-            "Sign Up"
+            "Log In"
           )}
         </button>
 
-        {/* Switch to Login */}
+        {/* Switch to Signup */}
         <p className="text-sm text-center text-gray-600 mt-4">
-          Already have an account?{" "}
+          Don’t have an account?{" "}
           <span
             onClick={() => toggleForm()}
             className="text-blue-500 hover:underline cursor-pointer"
           >
-            Log In
+            Sign Up
           </span>
         </p>
       </form>
@@ -193,4 +159,4 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
   );
 };
 
-export default Signup;
+export default Login;
