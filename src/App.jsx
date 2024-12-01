@@ -34,6 +34,7 @@ import {
 
 // Config
 import { config, server } from "./constants/config";
+import NotFound from "./components/NotFound";
 
 function App() {
   const { host, loading, user, challengeProgress } = useSelector(
@@ -97,9 +98,7 @@ function App() {
         </Route>
 
         {/* Public Routes */}
-        <Route
-          element={<ProtectRoute user={!host} redirect="/host-dashboard" />}
-        >
+        <Route element={<ProtectRoute user={!host} redirect="/host-dashboard" />}>
           <Route element={<NotProtectedLayout />}>
             <Route path="/" element={<Body />} />
             <Route path="/about" element={<About />} />
@@ -111,13 +110,13 @@ function App() {
         {/* Participant Protected Routes */}
         <Route element={<ProtectRoute user={user} />}>
           <Route element={<UserProtectedLayout />}>
-            <Route
-              path="/challenge-page"
-              element={<ParticipantChallengeOverviewPage />}
-            />
+            <Route path="/challenge-page" element={<ParticipantChallengeOverviewPage />} />
           </Route>
           <Route path="/editor" element={<MainCode />} />
         </Route>
+
+        {/* Catch-all Route for NotFound Page */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
