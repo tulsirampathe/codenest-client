@@ -81,6 +81,7 @@ function MainCode() {
 
       executeCode(language, sourceCode, publicTestCases)
         .then((results) => {
+          
           setOutput(results);
           const firstSyntaxError = results.find(
             (result) => result.error

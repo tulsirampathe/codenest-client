@@ -97,7 +97,9 @@ function App() {
         </Route>
 
         {/* Public Routes */}
-        <Route element={<ProtectRoute user={!host} redirect="/host-dashboard" />}>
+        <Route
+          element={<ProtectRoute user={!host} redirect="/host-dashboard" />}
+        >
           <Route element={<NotProtectedLayout />}>
             <Route path="/" element={<Body />} />
             <Route path="/about" element={<About />} />
@@ -107,17 +109,7 @@ function App() {
         </Route>
 
         {/* Participant Protected Routes */}
-        <Route
-          element={
-            <ProtectRoute
-              user={
-                challengeProgress
-                  ? challengeProgress.status !== "ended" && user
-                  : user
-              }
-            />
-          }
-        >
+        <Route element={<ProtectRoute user={user} />}>
           <Route element={<UserProtectedLayout />}>
             <Route
               path="/challenge-page"

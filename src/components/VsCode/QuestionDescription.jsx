@@ -14,9 +14,6 @@ function QuestionProblem({ QuestionData }) {
     questionID: QuestionData._id,
   });
 
-  console.log("sub : ", data);
-  
-
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
@@ -186,7 +183,8 @@ function QuestionProblem({ QuestionData }) {
                   <SubmissionsTable submissions={data.submissions} />
                 ) : (
                   <p className="text-gray-600">
-                    No submissions yet for this challenge or question. Stay tuned!
+                    No submissions yet for this challenge or question. Stay
+                    tuned!
                   </p>
                 )}
               </>

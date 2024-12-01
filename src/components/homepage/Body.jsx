@@ -111,7 +111,7 @@ const Body = () => {
       {!host && !user && (
         <div className="flex justify-center">
           {/* Admin Tab Content */}
-          {activeTab === "Admin" && !isLoggedIn && (
+          {activeTab === "Admin" && (
             <div className="bg-gray-800 rounded-lg shadow-lg p-10 max-w-md text-center">
               <h2 className="text-3xl font-extrabold text-yellow-400 mb-6">
                 Admin Dashboard
@@ -144,7 +144,7 @@ const Body = () => {
           )}
 
           {/* Student Tab Content */}
-          {activeTab === "Student" && !isLoggedIn && (
+          {activeTab === "Student" && (
             <div className="bg-gray-800 rounded-lg shadow-lg p-10 max-w-md text-center">
               <h2 className="text-3xl font-extrabold text-teal-400 mb-6">
                 Student Access

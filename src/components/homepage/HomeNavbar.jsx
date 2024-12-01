@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
+import { FaUserCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
-import axios from "axios";
 import { config, server } from "../../constants/config";
 import { userNotExists } from "../../redux/reducers/auth";
-import toast from "react-hot-toast";
 
 const HomeNavbar = () => {
   const { user } = useSelector((state) => state.auth);
@@ -62,11 +62,6 @@ const HomeNavbar = () => {
           <li>
             <Link to="/" className="hover:text-yellow-300">
               Home
-            </Link>
-          </li>
-          <li>
-            <Link to="/demo" className="hover:text-yellow-300">
-              Demo Test
             </Link>
           </li>
           <li>
