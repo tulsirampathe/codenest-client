@@ -46,7 +46,7 @@ const About = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-gray-700 p-6 shadow-md rounded-lg transition-transform transform hover:scale-105 hover:bg-gray-600">
             <p className="text-lg text-gray-300">"Codenest has completely transformed the way we conduct our coding assessments. It's intuitive and saves so much time!"</p>
-            <p className="text-right font-semibold mt-2 text-yellow-400">- Khoshbo Bharadwaj, Educator</p>
+            <p className="text-right font-semibold mt-2 text-yellow-400">- XYZ, Educator</p>
           </div>
           <div className="bg-gray-700 p-6 shadow-md rounded-lg transition-transform transform hover:scale-105 hover:bg-gray-600">
             <p className="text-lg text-gray-300">"As a student, I love how easy it is to navigate the tests on Codenest. It takes the stress out of coding exams!"</p>
