@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { hostExists, userExists } from "../../redux/reducers/auth";
+import { config } from "../../constants/config";
 
 // Helper function for validation
 const validateForm = (data) => {
@@ -59,7 +60,8 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
     try {
       const { data } = await axios.post(
         `${import.meta.env.VITE_SERVER}${endpoint}`,
-        formData
+        formData,
+        config
       );
 
       const { success, message, user, host } = data;
