@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { FaUserCircle } from "react-icons/fa";
+import { FaSignOutAlt, FaUserCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { config, server } from "../../constants/config";
@@ -11,6 +11,8 @@ const HomeNavbar = () => {
   const { user } = useSelector((state) => state.auth);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -35,6 +37,7 @@ const HomeNavbar = () => {
   const handleLogout = async (e) => {
     e.preventDefault();
 
+    setIsLoading(true);
     try {
       const { data } = await axios.post(`${server}/user/logout`, {}, config);
 
@@ -46,6 +49,8 @@ const HomeNavbar = () => {
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something Went Wrong");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -102,9 +107,16 @@ const HomeNavbar = () => {
                 <hr className="border-t border-gray-200" />
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
+                  className="w-full text-left px-4 py-2 text-sm font-semibold flex items-center text-red-500 hover:bg-gray-100"
+                  disabled={isLoading}
                 >
-                  Logout
+                  {isLoading ? (
+                    <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  ) : (
+                    <>
+                      <FaSignOutAlt className="mr-1" /> Logout
+                    </>
+                  )}
                 </button>
               </div>
             )}

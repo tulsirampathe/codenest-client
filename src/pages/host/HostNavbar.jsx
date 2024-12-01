@@ -1,6 +1,6 @@
 // HostNavbar.js
 import axios from "axios";
-import React from "react";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { FaHome, FaSignOutAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
@@ -10,11 +10,14 @@ import { hostNotExists } from "../../redux/reducers/auth";
 
 function HostNavbar() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
 
   const handleLogout = async (e) => {
     e.preventDefault();
+
+    setIsLoading(true);
 
     try {
       const { data } = await axios.post(`${server}/admin/logout`, {}, config);
@@ -27,6 +30,8 @@ function HostNavbar() {
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something Went Wrong");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -51,8 +56,15 @@ function HostNavbar() {
             <button
               onClick={handleLogout}
               className="hover:bg-indigo-700 px-3 py-2 rounded-md flex items-center"
+              disabled={isLoading}
             >
-              <FaSignOutAlt className="mr-1" /> Logout
+              {isLoading ? (
+                <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              ) : (
+                <>
+                  <FaSignOutAlt className="mr-1" /> Logout
+                </>
+              )}
             </button>
           </div>
         </div>
