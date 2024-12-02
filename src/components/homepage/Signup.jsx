@@ -1,11 +1,13 @@
 /* eslint-disable react/prop-types */
+import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import { FaGoogle } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { hostExists, userExists } from "../../redux/reducers/auth";
 import { config } from "../../constants/config";
+import { hostExists, userExists } from "../../redux/reducers/auth";
 
 // Helper function for validation
 const validateForm = (data) => {
@@ -89,6 +91,75 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
     }
   };
 
+  const responseGoogle = async (response) => {
+    try {
+      // Extract the authorization code from the Google response
+      const authCode = response?.code;
+
+      if (authCode) {
+        // Define the API endpoint based on user type
+        const endpoint =
+          userType === "Admin"
+            ? "/admin/loginWithGoogle"
+            : "/user/loginWithGoogle";
+
+        // Send the authorization code to your backend for further processing
+        const { data } = await axios.post(
+          `${import.meta.env.VITE_SERVER}${endpoint}`,
+          { code: authCode },
+          config
+        );
+
+        const { success, message, user, host } = data;
+
+        if (success) {
+          // Handle successful login for Admin or Student
+          if (userType === "Admin" && host) {
+            dispatch(hostExists(host));
+          } else if (userType === "Student" && user) {
+            dispatch(userExists(user));
+          } else {
+            toast.error(
+              "Unexpected response from the server. Please try again."
+            );
+            return;
+          }
+
+          toast.success(message); // Show success message
+          onSubmit();
+          navigate(userType === "Admin" ? "/admin-dashboard" : "/");
+        } else {
+          toast.error("Login failed. Please try again.");
+        }
+      } else {
+        // If the authCode is not available, show an error message
+        toast.error("Google authentication failed. Please try again.");
+      }
+    } catch (error) {
+      // Handle different types of errors and provide meaningful feedback
+      console.log("Error during Google login:", error);
+
+      // Check for network issues or server errors
+      if (!error.response) {
+        toast.error("Network error. Please check your internet connection.");
+      } else if (error.response.status >= 500) {
+        toast.error("Server error. Please try again later.");
+      } else {
+        // Handle other errors (like validation failures, etc.)
+        toast.error(
+          error?.response?.data?.message ||
+            "Google login failed. Please try again."
+        );
+      }
+    }
+  };
+
+  const handleLoginWithGoogle = useGoogleLogin({
+    onSuccess: responseGoogle, // Trigger the responseGoogle function on success
+    onError: responseGoogle, // Trigger the same function on error to handle gracefully
+    flow: "auth-code",
+  });
+
   return (
     <div className="flex items-center justify-center w-full">
       <form
@@ -170,7 +241,7 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-green-600 text-white font-bold py-2 rounded-lg hover:bg-green-700 transition"
+          className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition"
           disabled={isLoading}
         >
           {isLoading ? (
@@ -178,6 +249,20 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
           ) : (
             "Sign Up"
           )}
+        </button>
+
+        {/* Google Sign Up Button */}
+        <button
+          type="button"
+          className="w-full bg-[#34A853] text-white font-bold py-2 rounded-lg mt-4 hover:bg-[#2c8d44] transition"
+          disabled={isLoading}
+          onClick={handleLoginWithGoogle}
+        >
+          <div className="flex items-center justify-center space-x-2">
+            {/* Google Icon */}
+            <FaGoogle className="w-5 h-5" />
+            <span>Sign Up with Google</span>
+          </div>
         </button>
 
         {/* Switch to Login */}
