@@ -85,7 +85,7 @@ const HomeNavbar = () => {
               onClick={toggleDropdown}
               className="relative focus:outline-none"
             >
-              {user.picture ? (
+              {user?.picture ? (
                 <img
                   src={user.picture}
                   alt="User picture"
