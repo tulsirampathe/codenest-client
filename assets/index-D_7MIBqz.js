@@ -259,7 +259,7 @@ to {
   🔥 *Challenge Name*: ${e.title}
   💡 *Description*: ${e.description}
   
-  🔑 *Challenge Key*: *" ${e.key} "*
+  🔑 *Challenge Key*: ${e.key} 
   
   ⏳ *Challenge Timings*: 
     🗓️ *Start Time:*  ${a(e.startTime)}
