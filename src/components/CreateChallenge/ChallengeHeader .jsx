@@ -49,19 +49,22 @@ const ChallengeHeader = ({
   🔥 *Challenge Name*: ${challengeData.title}
   💡 *Description*: ${challengeData.description}
   
-  🔑 *Challenge Key*: ${challengeData.key}
+  🔑 *Challenge Key*: *" ${challengeData.key} "*
   
   ⏳ *Challenge Timings*: 
-    📅 Start Time: ${formatDisplayDateTime(challengeData.startTime)}
-    📅 End Time: ${formatDisplayDateTime(challengeData.endTime)}
+    🗓️ *Start Time:*  ${formatDisplayDateTime(challengeData.startTime)}
+    🗓️ *End Time:*  ${formatDisplayDateTime(challengeData.endTime)}
   
   ⏳ *How to Join the Challenge in 3 Easy Steps*:
-  1️⃣ Visit our website: ${import.meta.env.VITE_CLIENT}
+  1️⃣ *Visit our website:*  ${import.meta.env.VITE_CLIENT}  
   2️⃣ Login or Sign up as a Student
   3️⃣ Enter the provided Challenge Key to start!
   
   ⚡ Don't miss this amazing opportunity!
-  Act fast—join now and showcase your skills! 💪🎯
+  Act fast— join now and showcase your skills! 💪🎯
+
+  ✨ Visit our website for more information:  
+🌐 CodeNest | ${import.meta.env.VITE_CLIENT}
     `;
 
     // Properly encode the message for the URL
