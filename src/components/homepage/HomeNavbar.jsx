@@ -85,10 +85,10 @@ const HomeNavbar = () => {
               onClick={toggleDropdown}
               className="relative focus:outline-none"
             >
-              {user.avatar ? (
+              {user.picture ? (
                 <img
-                  src={user.avatar}
-                  alt="User Avatar"
+                  src={user.picture}
+                  alt="User picture"
                   className="w-10 h-10 rounded-full border-2 border-white cursor-pointer"
                 />
               ) : (

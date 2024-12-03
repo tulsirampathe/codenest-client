@@ -121,6 +121,15 @@ function HostDashboard() {
               <div className="bg-white p-6 rounded-lg shadow-md border border-indigo-200 z-10 relative">
                 <div className="flex items-center mb-6">
                   <FaUserCircle className="text-indigo-600 text-6xl" />
+                  {host.picture ? (
+                    <img
+                      src={host.picture}
+                      alt="User Picture"
+                      className="w-10 h-10 rounded-full border-2 border-white cursor-pointer"
+                    />
+                  ) : (
+                    <FaUserCircle className="text-indigo-600 text-6xl cursor-pointer" />
+                  )}
                   <div className="ml-4">
                     <h1 className="text-2xl font-semibold text-gray-800">
                       {host.username}
