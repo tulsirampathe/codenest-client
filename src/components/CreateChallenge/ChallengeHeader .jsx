@@ -49,7 +49,7 @@ const ChallengeHeader = ({
   🔥 *Challenge Name*: ${challengeData.title}
   💡 *Description*: ${challengeData.description}
   
-  🔑 *Challenge Key*: *" ${challengeData.key} "*
+  🔑 *Challenge Key*: ${challengeData.key} 
   
   ⏳ *Challenge Timings*: 
     🗓️ *Start Time:*  ${formatDisplayDateTime(challengeData.startTime)}
