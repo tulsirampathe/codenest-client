@@ -51,14 +51,18 @@ const ChallengeHeader = ({
   
   🔑 *Challenge Key*: ${challengeData.key}
   
+  ⏳ *Challenge Timings*: 
+    📅 Start Time: ${formatDisplayDateTime(challengeData.startTime)}
+    📅 End Time: ${formatDisplayDateTime(challengeData.endTime)}
+  
   ⏳ *How to Join the Challenge in 3 Easy Steps*:
   1️⃣ Visit our website: ${import.meta.env.VITE_CLIENT}
   2️⃣ Login or Sign up as a Student
   3️⃣ Enter the provided Challenge Key to start!
   
   ⚡ Don't miss this amazing opportunity!
-   Act fast—join now and showcase your skills! 💪🎯
-  `;
+  Act fast—join now and showcase your skills! 💪🎯
+    `;
 
     // Properly encode the message for the URL
     const encodedMessage = encodeURIComponent(message);
@@ -172,7 +176,9 @@ const ChallengeHeader = ({
                 <span className="font-bold text-indigo-700">
                   Challenge Key:
                 </span>
-                <span className="text-gray-700 mr-2 bg-zinc-100 p-1 rounded-md">{challengeData.key}</span>
+                <span className="text-gray-700 mr-2 bg-zinc-100 p-1 rounded-md">
+                  {challengeData.key}
+                </span>
               </div>
               {/* Copy Button */}
               <ActionButton
