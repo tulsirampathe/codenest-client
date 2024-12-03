@@ -16,6 +16,7 @@ const Login = ({ userType, onSubmit, toggleForm }) => {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [googleLoginLoading, setGoogleLoginLoading] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -47,6 +48,8 @@ const Login = ({ userType, onSubmit, toggleForm }) => {
     if (!validate()) return;
 
     setIsLoading(true); // Show loader while processing
+    const loginToast = toast.loading("Processing your login... please wait."); // Show loading toast
+
     const endpoint = userType === "Admin" ? "/admin/login" : "/user/login";
 
     try {
@@ -77,12 +80,19 @@ const Login = ({ userType, onSubmit, toggleForm }) => {
         error?.response?.data?.message || "Login failed. Please try again."
       );
     } finally {
+      toast.dismiss(loginToast); // Dismiss the loading toast
       setIsLoading(false); // Hide loader after response
     }
   };
 
   const responseGoogle = async (response) => {
+    let googleLoginToast;
     try {
+      setGoogleLoginLoading(true); // Set Google login loading state to true
+      googleLoginToast = toast.loading(
+        "Logging you in with Google... please wait."
+      ); // Show loading toast
+
       // Extract the authorization code from the Google response
       const authCode = response?.code;
 
@@ -103,7 +113,6 @@ const Login = ({ userType, onSubmit, toggleForm }) => {
         const { success, message, user, host } = data;
 
         if (success) {
-          // Handle successful login for Admin or Student
           if (userType === "Admin" && host) {
             dispatch(hostExists(host));
           } else if (userType === "Student" && user) {
@@ -122,31 +131,30 @@ const Login = ({ userType, onSubmit, toggleForm }) => {
           toast.error("Login failed. Please try again.");
         }
       } else {
-        // If the authCode is not available, show an error message
         toast.error("Google authentication failed. Please try again.");
       }
     } catch (error) {
-      // Handle different types of errors and provide meaningful feedback
       console.log("Error during Google login:", error);
 
-      // Check for network issues or server errors
       if (!error.response) {
         toast.error("Network error. Please check your internet connection.");
       } else if (error.response.status >= 500) {
         toast.error("Server error. Please try again later.");
       } else {
-        // Handle other errors (like validation failures, etc.)
         toast.error(
           error?.response?.data?.message ||
             "Google login failed. Please try again."
         );
       }
+    } finally {
+      toast.dismiss(googleLoginToast); // Dismiss the Google login loading toast
+      setGoogleLoginLoading(false); // Set Google login loading state back to false
     }
   };
 
   const handleLoginWithGoogle = useGoogleLogin({
-    onSuccess: responseGoogle, // Trigger the responseGoogle function on success
-    onError: responseGoogle, // Trigger the same function on error to handle gracefully
+    onSuccess: responseGoogle,
+    onError: responseGoogle,
     flow: "auth-code",
   });
 
@@ -208,7 +216,7 @@ const Login = ({ userType, onSubmit, toggleForm }) => {
         <button
           type="submit"
           className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition"
-          disabled={isLoading}
+          disabled={googleLoginLoading || isLoading}
         >
           {isLoading ? (
             <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -221,13 +229,19 @@ const Login = ({ userType, onSubmit, toggleForm }) => {
         <button
           type="button"
           className="w-full bg-[#34A853] text-white font-bold py-2 rounded-lg mt-4 hover:bg-[#2c8d44] transition"
-          disabled={isLoading}
+          disabled={googleLoginLoading || isLoading}
           onClick={handleLoginWithGoogle}
         >
           <div className="flex items-center justify-center space-x-2">
             {/* Google Icon */}
             <FaGoogle className="w-5 h-5" />
-            <span>Login with Google</span>
+            <span>
+              {googleLoginLoading ? (
+                <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              ) : (
+                "Login with Google"
+              )}
+            </span>
           </div>
         </button>
 
@@ -236,9 +250,9 @@ const Login = ({ userType, onSubmit, toggleForm }) => {
           Don’t have an account?{" "}
           <span
             onClick={() => toggleForm()}
-            className="text-blue-500 hover:underline cursor-pointer"
+            className="text-blue-600 cursor-pointer hover:underline"
           >
-            Sign Up
+            Sign up
           </span>
         </p>
       </form>

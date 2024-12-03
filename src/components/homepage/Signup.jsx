@@ -32,6 +32,7 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [googleLoginLoading, setGoogleLoginLoading] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -55,6 +56,8 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
     }
 
     setIsLoading(true);
+
+    const loginToast = toast.loading("Processing your signup... please wait."); // Show loading toast
 
     const endpoint =
       userType === "Admin" ? "/admin/register" : "/user/register";
@@ -87,12 +90,19 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
         error?.response?.data?.message || "Signup failed. Please try again."
       );
     } finally {
+      toast.dismiss(loginToast);
       setIsLoading(false);
     }
   };
 
   const responseGoogle = async (response) => {
+    let googleSingUpToast;
     try {
+      setGoogleLoginLoading(true); // Set Google login loading state to true
+      googleSingUpToast = toast.loading(
+        "Logging you in with Google... please wait."
+      ); // Show loading toast
+
       // Extract the authorization code from the Google response
       const authCode = response?.code;
 
@@ -151,6 +161,9 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
             "Google login failed. Please try again."
         );
       }
+    } finally {
+      toast.dismiss(googleSingUpToast);
+      setGoogleLoginLoading(false);
     }
   };
 
@@ -242,7 +255,7 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
         <button
           type="submit"
           className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition"
-          disabled={isLoading}
+          disabled={isLoading || googleLoginLoading}
         >
           {isLoading ? (
             <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -255,13 +268,19 @@ const Signup = ({ userType, onSubmit, toggleForm }) => {
         <button
           type="button"
           className="w-full bg-[#34A853] text-white font-bold py-2 rounded-lg mt-4 hover:bg-[#2c8d44] transition"
-          disabled={isLoading}
+          disabled={isLoading || googleLoginLoading}
           onClick={handleLoginWithGoogle}
         >
           <div className="flex items-center justify-center space-x-2">
             {/* Google Icon */}
             <FaGoogle className="w-5 h-5" />
-            <span>Sign Up with Google</span>
+            <span>
+              {googleLoginLoading ? (
+                <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              ) : (
+                "Sign Up with Google"
+              )}
+            </span>
           </div>
         </button>
 
