@@ -120,7 +120,6 @@ function HostDashboard() {
             <>
               <div className="bg-white p-6 rounded-lg shadow-md border border-indigo-200 z-10 relative">
                 <div className="flex items-center mb-6">
-                  <FaUserCircle className="text-indigo-600 text-6xl" />
                   {host?.picture ? (
                     <img
                       src={host.picture}
