@@ -13,6 +13,7 @@ import CodeNavbar from "./CodeNavbar";
 import Output from "./Output";
 import QuestionDescription from "./QuestionDescription";
 import { CODE_SNIPPETS } from "../../constants/constant";
+import SubmissionResultCard from "./SubmissionResultCard";
 
 function MainCode() {
   const editorRef = useRef();
@@ -24,19 +25,23 @@ function MainCode() {
   const [outputVisible, setOutputVisible] = useState(false);
   const [output, setOutput] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [ErrorMessage, setErrorMessage] = useState("");
   const [question, setQuestion] = useState(questionData);
   const [showQuestionList, setShowQuestionList] = useState(false);
 
+  const [showSubmissionResult, setShowSubmissionResult] = useState(false);
+  const [submissionResult, setSubmissionResult] = useState({
+    totalTestCases: 0,
+    passedTestCases: 0,
+    ErrorMessage: "",
+  });
+
   const [publicTestCases, setPublicTestCases] = useState([]);
-  const [publicTestResults, setPublicTestResults] = useState([]);
 
   const { data, isSuccess } = useGetTestCasesQuery(question._id);
 
   const { data: progressData } = useGetProgressQuery(challengeID);
-
-
-  const [submitCode, submitStatus] = useSubmitCodeMutation();
 
   // Handle API response and update testCases
   useEffect(() => {
@@ -45,12 +50,31 @@ function MainCode() {
     }
   }, [isSuccess, data?.publicTestCases]);
 
+  const [submitCode, submitStatus] = useSubmitCodeMutation();
+
+  useEffect(() => {
+    if (submitStatus.isSuccess) {
+      const data = submitStatus.data;
+
+      console.log(data);
+
+      setSubmissionResult({
+        totalTestCases: data?.totalTestCases || 0,
+        passedTestCases: data?.passedTestCases || 0,
+        ErrorMessage:
+        data?.errorDetails
+            ? data?.errorDetails || "An unknown error occurred."
+            : "",
+      });
+    }
+  }, [submitStatus.isSuccess, submitStatus.isError]);
+
   // Use the custom useMutationToast hook for each mutation
-  useMutationToast({
-    ...submitStatus,
-    loadingMessage: "Submitting the code...",
-    successMessage: submitStatus.data?.message,
-  });
+  // useMutationToast({
+  //   ...submitStatus,
+  //   loadingMessage: "Submitting the code...",
+  //   successMessage: submitStatus.data?.message,
+  // });
 
   // New state to manage the editor content
   const [editorContent, setEditorContent] = useState(
@@ -81,16 +105,10 @@ function MainCode() {
 
       executeCode(language, sourceCode, publicTestCases)
         .then((results) => {
-          
           setOutput(results);
           const firstSyntaxError = results.find(
             (result) => result.error
           )?.error;
-          const allTestCasesPassed = results.every(
-            (result) => result.status === "Pass"
-          );
-
-          setPublicTestResults(allTestCasesPassed);
 
           if (firstSyntaxError) {
             setErrorMessage(`Syntax Error: ${firstSyntaxError}`);
@@ -133,7 +151,8 @@ function MainCode() {
       return;
     }
 
-    setIsLoading(true);
+    setIsSubmitLoading(true);
+    setShowSubmissionResult(true); // Show result card
 
     try {
       setErrorMessage(""); // Reset error messages
@@ -145,14 +164,18 @@ function MainCode() {
         language: language,
       };
 
-      await submitCode(submissionData); // Submit the code after it's successfully run
+      await submitCode(submissionData); // Submit the code
 
-      // setOutputVisible(false); // Hide the output after submission
     } catch (error) {
       console.error("Error during submission:", error);
-      setErrorMessage("Submission failed. Please try again.");
+      setSubmissionResult({
+        totalTestCases: 0,
+        passedTestCases: 0,
+        ErrorMessage: "Submission failed. Please try again.",
+      });
+      setShowSubmissionResult(true); // Show result card with error
     } finally {
-      setIsLoading(false);
+      setIsSubmitLoading(false);
     }
   };
 
@@ -184,6 +207,15 @@ function MainCode() {
           outputVisible ? "grid-cols-12" : "grid-cols-8"
         }`}
       >
+        {showSubmissionResult && (
+          <SubmissionResultCard
+            totalTestCases={submissionResult.totalTestCases}
+            passedTestCases={submissionResult.passedTestCases}
+            ErrorMessage={submissionResult.ErrorMessage}
+            loading={isSubmitLoading}
+            onClose={() => setShowSubmissionResult(false)}
+          />
+        )}
         {/* Question List */}
         {showQuestionList && (
           <div className="absolute top-0 left-0 w-1/4 h-full bg-white shadow-lg p-4 rounded-r-lg border-r border-gray-300 z-10 overflow-y-auto">

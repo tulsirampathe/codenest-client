@@ -59,7 +59,7 @@ function Output({ handleCloseOutput, isLoading, ErrorMessage, output }) {
                 {/* Display "All test cases did not pass" if any test case failed */}
                 {hasFailedTestCase && (
                   <div className="text-red-600 text-base font-semibold bg-red-50 p-3 rounded mb-4">
-                    All test cases did not pass
+                    All Public test cases did not pass
                   </div>
                 )}
 
