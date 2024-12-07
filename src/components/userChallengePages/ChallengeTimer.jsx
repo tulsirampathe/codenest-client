@@ -6,7 +6,6 @@ import { formatTime } from "../../constants/constant";
 function ChallengeTimer({
   challengeData,
   isChallengeLoading,
-  participantScore,
   onChallengeStatusChange,
 }) {
   const [timeLeft, setTimeLeft] = useState(null);

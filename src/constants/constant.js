@@ -13,14 +13,14 @@ export const CODE_SNIPPETS = {
 };
 
 export const formatTime = (time) => {
-  const hours = String(Math.floor((time / (1000 * 60 * 60)) % 24)).padStart(
-    2,
-    "0"
-  );
-  const minutes = String(Math.floor((time / (1000 * 60)) % 60)).padStart(
-    2,
-    "0"
-  );
+  const days = Math.floor(time / (1000 * 60 * 60 * 24)); // Calculate days
+  const hours = String(Math.floor((time / (1000 * 60 * 60)) % 24)).padStart(2, "0");
+  const minutes = String(Math.floor((time / (1000 * 60)) % 60)).padStart(2, "0");
   const seconds = String(Math.floor((time / 1000) % 60)).padStart(2, "0");
-  return `${hours}:${minutes}:${seconds}`;
+
+  if (days > 0) {
+    return `${days}d ${hours}:${minutes}:${seconds}`;
+  } else {
+    return `${hours}:${minutes}:${seconds}`;
+  }
 };
