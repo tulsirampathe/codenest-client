@@ -13,7 +13,7 @@ const LeaderboardOrParticipationPanel = ({
   challengeData,
 }) => {
   const { challengeID } = useSelector((state) => state.auth);
-  const [activePanel, setActivePanel] = useState("leaderboard");
+  const [activePanel, setActivePanel] = useState("participation");
   const [leaderboard, setLeaderboard] = useState(null);
 
   const { data: leaderboardData, isLoading: isLeaderboardLoading } =

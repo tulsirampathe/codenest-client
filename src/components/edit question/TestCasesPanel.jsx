@@ -1,10 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import {
-  AiOutlineDelete,
-  AiOutlineEdit
-} from "react-icons/ai";
+import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { useSelector } from "react-redux";
 import useMutationToast from "../../hooks/useMutationToast";
 import {
@@ -19,7 +16,6 @@ function TestCasesPanel() {
   const { questionID } = useSelector((state) => state.auth);
   const [testCases, setTestCases] = useState([]);
   const { data, isSuccess } = useGetTestCasesQuery(questionID);
-  
 
   const [addTestCase, addTestCaseStatus] = useAddTestCaseMutation();
   const [updateTestCase, updateTestCaseStatus] = useUpdateTestCaseMutation();
@@ -31,7 +27,6 @@ function TestCasesPanel() {
     successMessage:
       addTestCaseStatus.data?.message || "Test case added successfully!",
   });
-  
 
   useMutationToast({
     ...updateTestCaseStatus,
@@ -74,7 +69,6 @@ function TestCasesPanel() {
           input: newTestCase.input.replace(/\n/g, "\n"), // Ensure new lines are formatted for JSON
           output: newTestCase.output.replace(/\n/g, "\n"), // Ensure new lines are formatted for JSON
         };
-        
 
         if (updateTestCaseId) {
           await updateTestCase({
@@ -250,14 +244,24 @@ function TestCasesPanel() {
             >
               <div className="flex-1">
                 <p className="text-sm text-gray-700 mb-1">
-                  <strong>Type:</strong> {testCase.type}
+                  <strong>Type:</strong>
                 </p>
+                <p className="text-sm text-gray-900 mb-2">{testCase.type}</p>
+
                 <p className="text-sm text-gray-700 mb-1">
-                  <strong>Input:</strong> {testCase.input}
+                  <strong>Input:</strong>
                 </p>
+                <p className="text-sm text-gray-900 mb-2 whitespace-pre-wrap">
+                  {testCase.input}
+                </p>
+
                 <p className="text-sm text-gray-700 mb-1">
-                  <strong>Output:</strong> {testCase.output}
+                  <strong>Output:</strong>
                 </p>
+                <p className="text-sm text-gray-900 mb-2 whitespace-pre-wrap">
+                  {testCase.output}
+                </p>
+
                 <div className="text-xs text-gray-500">
                   {testCase.isHidden ? "Hidden" : "Visible"}
                 </div>

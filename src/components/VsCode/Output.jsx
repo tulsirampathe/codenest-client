@@ -1,27 +1,23 @@
-/* eslint-disable react/display-name */
 /* eslint-disable react/prop-types */
-import React, { useRef } from "react";
-import { FiX } from "react-icons/fi";
+import React, { useState } from "react";
+import { FiChevronRight, FiChevronDown, FiX, FiCheck } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
 
 function Output({ handleCloseOutput, isLoading, ErrorMessage, output }) {
-  // Refs for the scrollable sections
-  const inputsRef = useRef(null);
-  const outputsRef = useRef(null);
-  const expectedRef = useRef(null);
-  
-  // Synchronize scrolling across sections
-  const handleScroll = (e, refs) => {
-    const scrollTop = e.target.scrollTop;
-    refs.forEach((ref) => {
-      if (ref.current && ref.current !== e.target) {
-        ref.current.scrollTop = scrollTop;
-      }
-    });
+  const [expandedIndex, setExpandedIndex] = useState(null); // Tracks the expanded test case
+
+  const toggleExpand = (index) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
   };
 
-  // Check if any test case failed
-  const hasFailedTestCase = output?.some((result) => result.status === "Fail");
+  // Find the index of the first failing test case
+  const firstFailIndex = output?.findIndex(
+    (result) => result?.status === "Fail"
+  );
+
+  // Limit output to the first failing test case and previous test cases
+  const limitedOutput =
+    firstFailIndex !== -1 ? output?.slice(0, firstFailIndex + 1) : output;
 
   // Check if all test cases passed
   const allTestCasesPassed = output?.every(
@@ -54,15 +50,8 @@ function Output({ handleCloseOutput, isLoading, ErrorMessage, output }) {
           </div>
         ) : (
           <div>
-            {output?.length > 0 ? (
+            {limitedOutput?.length > 0 ? (
               <div className="space-y-4">
-                {/* Display "All test cases did not pass" if any test case failed */}
-                {hasFailedTestCase && (
-                  <div className="text-red-600 text-base font-semibold bg-red-50 p-3 rounded mb-4">
-                    All Public test cases did not pass
-                  </div>
-                )}
-
                 {/* Display success message if all test cases passed */}
                 {allTestCasesPassed && (
                   <div className="text-green-600 text-base font-semibold bg-green-50 p-3 rounded mb-4">
@@ -70,42 +59,63 @@ function Output({ handleCloseOutput, isLoading, ErrorMessage, output }) {
                   </div>
                 )}
 
-                <Section
-                  title="Input"
-                  ref={inputsRef}
-                  onScroll={(e) => handleScroll(e, [outputsRef, expectedRef])}
-                >
-                  {output.map((result, index) => (
-                    <Row key={index} index={index + 1} content={result.input} />
-                  ))}
-                </Section>
-                <Section
-                  title="Output"
-                  ref={outputsRef}
-                  onScroll={(e) => handleScroll(e, [inputsRef, expectedRef])}
-                >
-                  {output.map((result, index) => (
-                    <Row
-                      key={index}
-                      index={index + 1}
-                      content={result.actualOutput}
-                      status={result.status}
-                    />
-                  ))}
-                </Section>
-                <Section
-                  title="Desired output"
-                  ref={expectedRef}
-                  onScroll={(e) => handleScroll(e, [inputsRef, outputsRef])}
-                >
-                  {output.map((result, index) => (
-                    <Row
-                      key={index}
-                      index={index + 1}
-                      content={result.expectedOutput}
-                    />
-                  ))}
-                </Section>
+                {/* Test Cases */}
+                <div className="bg-gray-50 rounded-lg border border-gray-200">
+                  <h2 className="p-3 bg-gray-100 font-semibold text-gray-800">
+                    {limitedOutput.length} Test Cases
+                  </h2>
+                  <div className="divide-y divide-gray-200">
+                    {limitedOutput.map((result, index) => (
+                      <div key={index}>
+                        {/* Test Case Header */}
+                        <div
+                          className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-100"
+                          onClick={() => toggleExpand(index)}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <div
+                              className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                                result.status === "Fail"
+                                  ? "bg-red-500 text-white"
+                                  : "bg-green-500 text-white"
+                              }`}
+                            >
+                              {result.status === "Fail" ? (
+                                <FiX className="text-sm" /> // Red cross icon for Fail
+                              ) : (
+                                <FiCheck className="text-sm" /> // Green checkmark icon for Pass
+                              )}
+                            </div>
+                            <span className="text-sm font-medium">
+                              Test case {index + 1}
+                            </span>
+                          </div>
+                          {expandedIndex === index ? (
+                            <FiChevronDown className="text-gray-600" />
+                          ) : (
+                            <FiChevronRight className="text-gray-600" />
+                          )}
+                        </div>
+
+                        {/* Expanded Content */}
+                        {expandedIndex === index && (
+                          <div className="bg-gray-50 p-4 space-y-2">
+                            <Section title="Input: " content={result.input} />
+                            <Section
+                              title="Output: "
+                              content={result.actualOutput}
+                              status={result.status}
+                            />
+                            <Section
+                              title="Desired Output: "
+                              content={result.expectedOutput}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             ) : (
               <p className="text-gray-500 text-sm text-center">
@@ -119,42 +129,18 @@ function Output({ handleCloseOutput, isLoading, ErrorMessage, output }) {
   );
 }
 
-/* Row Component */
-const Row = ({ index, content, status }) => (
-  <div className="flex items-start">
-    {/* Index Circle */}
+/* Section Component */
+const Section = ({ title, content, status }) => (
+  <div>
+    <h3 className="text-sm font-semibold text-gray-700">{title}</h3>
     <div
-      className={`w-6 h-6 text-sm text-center  ${
-        status === "Fail" ? " bg-red-200" : " bg-gray-200"
-      } text-gray-600 rounded-full flex items-center justify-center font-semibold`}
-    >
-      {index}
-    </div>
-    {/* Content */}
-    <div
-      className={`ml-3 text-sm font-mono ${
-        status === "Fail" ? "text-red-600" : "text-gray-600"
+      className={`p-2 text-sm font-mono whitespace-pre-wrap ${
+        status === "Fail" ? "text-red-600" : "text-gray-700"
       }`}
     >
       {content}
     </div>
   </div>
 );
-
-/* Section Component */
-const Section = React.forwardRef(({ title, children, onScroll }, ref) => (
-  <div className="bg-gray-50 p-4 rounded border border-gray-200">
-    <div className="flex items-center justify-between mb-3">
-      <h4 className="text-base font-semibold text-gray-800">{title}</h4>
-    </div>
-    <div
-      ref={ref}
-      className="space-y-2 max-h-24 overflow-auto"
-      onScroll={onScroll}
-    >
-      {children}
-    </div>
-  </div>
-));
 
 export default Output;

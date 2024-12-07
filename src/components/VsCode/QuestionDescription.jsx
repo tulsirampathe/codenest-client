@@ -98,19 +98,26 @@ function QuestionProblem({ QuestionData }) {
                     <h3 className="text-md font-semibold text-gray-800 mb-2">
                       Example {i + 1}
                     </h3>
-                    <p className="text-gray-700">
-                      <span className="font-semibold">Input:</span>{" "}
+
+                    <p className="text-gray-700 font-semibold mb-1">Input:</p>
+                    <p className="text-gray-700 mb-2 whitespace-pre-wrap">
                       {example.input}
                     </p>
-                    <p className="text-gray-700">
-                      <span className="font-semibold">Output:</span>{" "}
+
+                    <p className="text-gray-700 font-semibold mb-1">Output:</p>
+                    <p className="text-gray-700 mb-2 whitespace-pre-wrap">
                       {example.output}
                     </p>
+
                     {example.explanation && (
-                      <p className="text-gray-700 mt-1">
-                        <span className="font-semibold">Explanation:</span>{" "}
-                        {example.explanation}
-                      </p>
+                      <>
+                        <p className="text-gray-700 font-semibold mb-1">
+                          Explanation:
+                        </p>
+                        <p className="text-gray-700 whitespace-pre-wrap">
+                          {example.explanation}
+                        </p>
+                      </>
                     )}
                   </div>
                 ))}

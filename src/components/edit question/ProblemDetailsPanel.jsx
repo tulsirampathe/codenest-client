@@ -5,12 +5,10 @@ import { AiOutlinePlus } from "react-icons/ai";
 function ProblemDetailsPanel({ problemDetails, setProblemDetails }) {
   const handleExampleChange = (id, field, value) => {
     const updatedExamples = problemDetails.examples.map((example) =>
-      example.id === id ? { ...example, [field]: value } : example
+      example._id === id ? { ...example, [field]: value } : example
     );
     setProblemDetails((prev) => ({ ...prev, examples: updatedExamples }));
-  };
-
-  console.log(problemDetails.examples);
+  }
   
 
   const addExample = () => {
@@ -28,7 +26,7 @@ function ProblemDetailsPanel({ problemDetails, setProblemDetails }) {
 
   const removeExample = (id) => {
     const updatedExamples = problemDetails.examples.filter(
-      (example) => example.id !== id
+      (example) => example._id !== id
     );
     setProblemDetails((prev) => ({ ...prev, examples: updatedExamples }));
   };
@@ -88,13 +86,13 @@ function ProblemDetailsPanel({ problemDetails, setProblemDetails }) {
         </label>
         {problemDetails.examples.map((example) => (
           <div
-            key={example.id}
+            key={example._id}
             className="p-4 border border-gray-200 rounded-lg shadow-sm space-y-3 bg-gray-50"
           >
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium text-gray-700">Example</h3>
               <button
-                onClick={() => removeExample(example.id)}
+                onClick={() => removeExample(example._id)}
                 className="text-red-500 hover:underline text-sm font-medium transform hover:scale-105 transition-transform duration-150"
               >
                 Remove
@@ -108,7 +106,7 @@ function ProblemDetailsPanel({ problemDetails, setProblemDetails }) {
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
                 value={example.input}
                 onChange={(e) =>
-                  handleExampleChange(example.id, "input", e.target.value)
+                  handleExampleChange(example._id, "input", e.target.value)
                 }
               />
             </div>
@@ -120,7 +118,7 @@ function ProblemDetailsPanel({ problemDetails, setProblemDetails }) {
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
                 value={example.output}
                 onChange={(e) =>
-                  handleExampleChange(example.id, "output", e.target.value)
+                  handleExampleChange(example._id, "output", e.target.value)
                 }
               />
             </div>
@@ -134,7 +132,7 @@ function ProblemDetailsPanel({ problemDetails, setProblemDetails }) {
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
                 value={example.explanation}
                 onChange={(e) =>
-                  handleExampleChange(example.id, "explanation", e.target.value)
+                  handleExampleChange(example._id, "explanation", e.target.value)
                 }
               />
             </div>

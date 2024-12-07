@@ -69,22 +69,31 @@ function MainCode() {
     }
   }, [submitStatus.isSuccess, submitStatus.isError]);
 
-  // Use the custom useMutationToast hook for each mutation
-  // useMutationToast({
-  //   ...submitStatus,
-  //   loadingMessage: "Submitting the code...",
-  //   successMessage: submitStatus.data?.message,
-  // });
-
-  // New state to manage the editor content
   const [editorContent, setEditorContent] = useState(
     questionData?.boilerplateCode?.[language] || ""
   );
 
   useEffect(() => {
-    // Update editor content when language or question changes
     setEditorContent(question?.boilerplateCode?.[language] || "");
   }, [language, question]);
+
+  // Add beforeunload event listener to confirm before refresh
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      // Only show the message if the editor has content
+      if (editorContent) {
+        const message = "You  have unsaved changes. Are you sure you want to leave?";
+        event.returnValue = message; // Standard for most browsers
+        return message; // For some older browsers
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [editorContent]); // Trigger when editorContent changes
 
   const onMount = (editor) => {
     editorRef.current = editor;
