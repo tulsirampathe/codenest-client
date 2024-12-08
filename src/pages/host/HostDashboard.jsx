@@ -1,3 +1,4 @@
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import {
   FaCalendarAlt,
@@ -183,26 +184,14 @@ function HostDashboard() {
                       <p className="flex items-center text-gray-500 mt-2">
                         <FaCalendarAlt className="mr-2 text-indigo-600" />
                         Start:{" "}
-                        {new Date(challenge.startTime).toLocaleString("en-IN", {
-                          timeZone: "Asia/Kolkata",
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        {moment(challenge.startTime)
+                          .format("DD MMMM YYYY, hh:mm A")}
                       </p>
                       <p className="flex items-center text-gray-500">
                         <FaCalendarAlt className="mr-2 text-indigo-600" />
                         End:{" "}
-                        {new Date(challenge.endTime).toLocaleString("en-IN", {
-                          timeZone: "Asia/Kolkata",
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        {moment(challenge.endTime)
+                          .format("DD MMMM YYYY, hh:mm A")}
                       </p>
                       <div className="flex items-center justify-between mt-4 text-gray-600">
                         <p className="flex items-center">

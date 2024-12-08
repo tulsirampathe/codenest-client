@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import clsx from "clsx";
+import moment from "moment";
 import {
   FaCalendarAlt,
   FaClipboard,
@@ -21,51 +22,37 @@ const ChallengeHeader = ({
 }) => {
   // Function to format date and time for display (e.g., "1 December 2024, 14:30")
   const formatDisplayDateTime = (date) => {
-    return new Date(date).toLocaleString("en-IN", {
-      timeZone: "Asia/Kolkata",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    return moment(date).format("D MMMM YYYY, h:mm A");
   };
 
   // Function to format date and time for input field (e.g., "2024-12-01T14:30")
   const formatInputDateTime = (date) => {
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return moment(date).format("YYYY-MM-DDTHH:mm");
   };
 
   const shareOnWhatsApp = () => {
     const message = `
-  🚨 *Invitation to Join the Challenge!* 🚨
+📢 *Invitation to Join the Challenge!* 
   
-  🔥 *Challenge Name*: ${challengeData.title}
-  💡 *Description*: ${challengeData.description}
+🔥 *Challenge Name*: ${challengeData.title}
+💡 *Description*: ${challengeData.description}
   
-  🔑 *Challenge Key*: ${challengeData.key}
+🔑 *Challenge Key*: ${challengeData.key}
   
-  ⏳ *Challenge Timings*: 
-    🗓️ *Start Time:*  ${formatDisplayDateTime(challengeData.startTime)}
-    🗓️ *End Time:*  ${formatDisplayDateTime(challengeData.endTime)}
+⏳ *Challenge Timings*: 
+  🗓️ *Start Time:*  ${formatDisplayDateTime(challengeData.startTime)}
+  🗓️ *End Time:*  ${formatDisplayDateTime(challengeData.endTime)}
   
-  ⏳ *How to Join the Challenge in 3 Easy Steps*:
-  1️⃣ *Visit our website:*  ${import.meta.env.VITE_CLIENT}  
-  2️⃣ Login or Sign up as a Student
-  3️⃣ Enter the provided Challenge Key to start!
+⏳ *How to Join the Challenge in 3 Easy Steps*:
+1️⃣ *Visit our website:*  ${import.meta.env.VITE_CLIENT}  
+2️⃣ Login or Sign up as a Student
+3️⃣ Enter the provided Challenge Key to start!
   
-  ⚡ Don't miss this amazing opportunity!
-  Act fast— join now and showcase your skills! 💪🎯
-
-  ✨ Visit our website for more information:  
-🌐 CodeNest | ${import.meta.env.VITE_CLIENT}
-    `;
+⚡ Don't miss this amazing opportunity!
+Act fast— join now and showcase your skills! 💪🎯
+  
+— CodeNest
+`;
 
     // Properly encode the message for the URL
     const encodedMessage = encodeURIComponent(message);

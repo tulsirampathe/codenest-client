@@ -13,6 +13,7 @@ import {
 } from "../../redux/reducers/auth";
 import LoadingSpinner from "../LoadingSpinner";
 import ChallengeTimer from "./ChallengeTimer"; // Import your new component
+import moment from "moment";
 
 function ParticipantChallengeOverviewPage() {
   const navigate = useNavigate();
@@ -65,24 +66,10 @@ function ParticipantChallengeOverviewPage() {
                 <span className="font-bold text-indigo-700">Start Date:</span>
               </div>
               <span className="text-gray-700">
-                {new Date(challengeData.startTime).toLocaleDateString(
-                  undefined,
-                  {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  }
-                )}
+                {moment(challengeData.startTime).format("DD MMM YYYY")}
               </span>
               <span className="text-gray-600">
-                {new Date(challengeData.startTime).toLocaleTimeString(
-                  undefined,
-                  {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                  }
-                )}
+                {moment(challengeData.startTime).format("hh:mm A")}
               </span>
             </div>
 
@@ -92,18 +79,10 @@ function ParticipantChallengeOverviewPage() {
                 <span className="font-bold text-indigo-700">End Date:</span>
               </div>
               <span className="text-gray-700">
-                {new Date(challengeData.endTime).toLocaleDateString(undefined, {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
+                {moment(challengeData.endTime).format("DD MMM YYYY")}
               </span>
               <span className="text-gray-600">
-                {new Date(challengeData.endTime).toLocaleTimeString(undefined, {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true,
-                })}
+                {moment(challengeData.endTime).format("hh:mm A")}
               </span>
             </div>
           </div>

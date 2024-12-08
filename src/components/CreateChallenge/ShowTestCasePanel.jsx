@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
-import React from "react";
+import React, { useEffect } from "react";
 import TestCasesPanel from "../edit question/TestCasesPanel";
 
-function ShowTestCasePanel({handleTestCaseToggle, testCases, setTestCases}) {
+function ShowTestCasePanel({ handleTestCaseToggle }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
       <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-3xl p-6 sm:p-8 lg:p-10">
@@ -22,7 +22,7 @@ function ShowTestCasePanel({handleTestCaseToggle, testCases, setTestCases}) {
 
         {/* Content */}
         <div className="overflow-y-auto max-h-[70vh]">
-          <TestCasesPanel testCases={testCases} setTestCases={setTestCases} />
+          <TestCasesPanel />
         </div>
       </div>
     </div>

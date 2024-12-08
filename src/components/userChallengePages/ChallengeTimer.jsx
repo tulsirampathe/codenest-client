@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
+import moment from "moment";
 import { FaCheckCircle, FaClock, FaTimesCircle } from "react-icons/fa";
 import { formatTime } from "../../constants/constant";
 
@@ -15,20 +16,20 @@ function ChallengeTimer({
   useEffect(() => {
     if (isChallengeLoading || !challengeData) return;
 
-    const startTime = new Date(challengeData.startTime).getTime();
-    const endTime = new Date(challengeData.endTime).getTime();
+    const startTime = moment(challengeData.startTime);
+    const endTime = moment(challengeData.endTime);
 
     const updateTimer = () => {
-      const currentTime = Date.now();
+      const currentTime = moment();
 
-      if (currentTime < startTime) {
+      if (currentTime.isBefore(startTime)) {
         setHasStarted(false);
         setHasEnded(false);
-        setTimeLeft(startTime - currentTime);
-      } else if (currentTime >= startTime && currentTime <= endTime) {
+        setTimeLeft(startTime.diff(currentTime));
+      } else if (currentTime.isBetween(startTime, endTime)) {
         setHasStarted(true);
         setHasEnded(false);
-        setTimeLeft(endTime - currentTime);
+        setTimeLeft(endTime.diff(currentTime));
       } else {
         setHasStarted(false);
         setHasEnded(true);

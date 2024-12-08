@@ -5,7 +5,6 @@ import { FiSettings, FiUser } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { formatTime } from "../../constants/constant";
 import { useEndChallengeMutation } from "../../redux/api/api";
-import useMutationToast from "../../hooks/useMutationToast";
 import ConfirmationModal from "../../shared/ConfirmationModal";
 
 function CodeNavbar({

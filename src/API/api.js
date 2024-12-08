@@ -11,7 +11,6 @@ export const executeCode = async (language, sourceCode, testCases = []) => {
 
 
     for (const testCase of testCases) {
-      // const input = testCase.input.join("\n"); // Join array to create multiline input
 
       const response = await API.post("/execute", {
         language: language,

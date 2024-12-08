@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const LANGUAGE_VERSIONS = {
   cpp: "10.2.0",
   javascript: "18.15.0",
@@ -13,14 +15,17 @@ export const CODE_SNIPPETS = {
 };
 
 export const formatTime = (time) => {
-  const days = Math.floor(time / (1000 * 60 * 60 * 24)); // Calculate days
-  const hours = String(Math.floor((time / (1000 * 60 * 60)) % 24)).padStart(2, "0");
-  const minutes = String(Math.floor((time / (1000 * 60)) % 60)).padStart(2, "0");
-  const seconds = String(Math.floor((time / 1000) % 60)).padStart(2, "0");
+  const duration = moment.duration(time, "milliseconds");
 
-  if (days > 0) {
-    return `${days}d ${hours}:${minutes}:${seconds}`;
-  } else {
-    return `${hours}:${minutes}:${seconds}`;
-  }
+  const days = duration.days();
+  const hours = String(duration.hours()).padStart(2, "0");
+  const minutes = String(duration.minutes()).padStart(2, "0");
+  const seconds = String(duration.seconds()).padStart(2, "0");
+
+  // Conditional formatting
+  return days > 0
+    ? `${days}d ${hours}:${minutes}:${seconds}`
+    : `${hours}:${minutes}:${seconds}`;
 };
+
+

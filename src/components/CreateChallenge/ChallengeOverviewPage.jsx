@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +7,7 @@ import {
   useChallengeDataQuery,
   useDeleteChallengeMutation,
   useEditChallengeDataMutation,
-  useGetLeaderboardQuery,
-  useRemoveQuestionMutation,
+  useRemoveQuestionMutation
 } from "../../redux/api/api";
 import { setQuestionID } from "../../redux/reducers/auth";
 import ConfirmationDeleteModal from "../../shared/ConfirmationDeleteModal";
@@ -28,7 +27,6 @@ function ChallengeOverviewPage() {
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [showTestCasePanel, setShowTestCasePanel] = useState(false);
   const [showQuestionList, setShowQuestionList] = useState(false);
-  const [testCases, setTestCases] = useState([]);
   const [copied, setCopied] = useState(false);
   const [question, setQuestion] = useState("");
 
@@ -98,10 +96,14 @@ function ChallengeOverviewPage() {
   };
 
   // Show/hide test case panel
-  const handleTestCaseToggle = (questionID) => {
-    dispatch(setQuestionID(questionID));
-    setShowTestCasePanel(!showTestCasePanel);
-  };
+  const handleTestCaseToggle = useCallback(
+    (questionID) => {
+      // dispatch(setQuestionID(questionID));
+      setShowTestCasePanel((prevState) => !prevState);
+    },
+    [dispatch]
+  );
+  
 
   // Function to handle time conversion to UTC
   const convertToUTC = (localDateTime) => {
@@ -204,8 +206,7 @@ function ChallengeOverviewPage() {
       {showTestCasePanel && (
         <ShowTestCasePanel
           handleTestCaseToggle={handleTestCaseToggle}
-          testCases={testCases}
-          setTestCases={setTestCases}
+          className="transition-opacity duration-300 ease-in-out opacity-100"
         />
       )}
     </div>

@@ -7,6 +7,7 @@ import {
   useGetLeaderboardQuery,
 } from "../../redux/api/api";
 import useMutationToast from "../../hooks/useMutationToast";
+import moment from "moment";
 
 const LeaderboardOrParticipationPanel = ({
   isChallengeLoading,
@@ -103,9 +104,10 @@ const LeaderboardOrParticipationPanel = ({
                 <table className="w-full table-auto text-sm rounded-lg shadow-lg">
                   <thead className="bg-indigo-600 text-white text-left sticky top-0 z-10">
                     <tr>
-                      <th className="px-6 py-3">Rank</th>
+                      <th className="px-6 py-3 text-center">Rank</th>
                       <th className="px-6 py-3">Name</th>
                       <th className="px-6 py-3 text-right">Points</th>
+                      <th className="px-6 py-3 text-right">Time</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -114,14 +116,17 @@ const LeaderboardOrParticipationPanel = ({
                         key={idx}
                         className={`${
                           idx % 2 === 0 ? "bg-indigo-50" : "bg-white"
-                        } hover:bg-indigo-100 transition`}
+                        } hover:bg-indigo-100 transition duration-200`}
                       >
-                        <td className="px-6 py-3">{idx + 1}</td>
+                        <td className="px-6 py-3 text-center">{idx + 1}</td>
                         <td className="px-6 py-3">
                           {participant.user.username}
                         </td>
                         <td className="px-6 py-3 text-right">
                           {participant.totalScore} pts
+                        </td>
+                        <td className="px-6 py-3 text-right">
+                          {moment.duration(participant.timeTaken).humanize()}
                         </td>
                       </tr>
                     ))}

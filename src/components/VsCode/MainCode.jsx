@@ -173,6 +173,9 @@ function MainCode() {
         language: language,
       };
 
+      console.log("SubData : ", submissionData);
+      
+
       await submitCode(submissionData); // Submit the code
 
     } catch (error) {
