@@ -1,40 +1,98 @@
 import React from "react";
-import pawanImg from "../../assets/ram.jpeg";
+import { FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
+import pawanImg from "../../assets/pawan.jpg";
 import tulsiImg from "../../assets/tulsi.jpeg";
 import ujjwalImg from "../../assets/ujjwal.jpeg";
 
 const Team = () => {
   const teamMembers = [
-    { name: "Pawan Tiwari", img: pawanImg, work: "Frontend" },
-    { name: "Tulsiram Pathe", img: tulsiImg, work: "Backend" },
-    { name: "Ujjwal Pateliya", img: ujjwalImg, work: "Team Spirit" },
+    {
+      name: "Pawan Tiwari",
+      img: pawanImg,
+      work: "Frontend Developer",
+      socials: {
+        linkedin: "https://www.linkedin.com/in/pawan-tiwari-922284246/",
+        github: "https://github.com/ramraja1",
+        twitter: "#",
+      },
+    },
+    {
+      name: "Tulsiram Pathe",
+      img: tulsiImg,
+      work: "Backend Developer",
+      socials: {
+        linkedin: "https://www.linkedin.com/in/tulsiram-pathe-03b7b9258/",
+        github: "https://github.com/tulsirampathe",
+        twitter: "#",
+      },
+    },
+    {
+      name: "Ujjwal Pateliya",
+      img: ujjwalImg,
+      work: "Team Manager",
+      socials: {
+        linkedin: "https://www.linkedin.com/in/ujjval-pateliya-qwer2005/",
+        github: "https://github.com/ujjvalap",
+        twitter: "#",
+      },
+    },
   ];
 
   return (
-    <div className="relative bg-gray-900 py-20 overflow-hidden">
-      <h2 className="relative text-center text-4xl font-bold text-white mb-6 z-10">
-        Meet the Team
-      </h2>
+    <div className="relative bg-gradient-to-b from-gray-900 to-gray-700 py-20">
+      <div className="container mx-auto px-6 text-center">
+        <h2 className="text-5xl font-bold text-white mb-12">Meet the Team</h2>
 
-      <div className="flex justify-center gap-12 z-10 relative">
-        {teamMembers.map((member, index) => (
-          <div
-            key={index}
-            className="relative bg-white p-8 w-72 h-96 shadow-xl rounded-lg transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl text-center group"
-          >
-            {/* Sweating Effect */}
-            <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-t from-transparent to-blue-300 opacity-10 group-hover:opacity-30 transition-opacity"></div>
-            <img
-              src={member.img}
-              alt={member.name}
-              className="w-36 h-36 rounded-full mx-auto mb-6 object-cover"
-            />
-            <h3 className="text-2xl font-semibold text-gray-800 mb-2">
-              {member.name}
-            </h3>
-            <p className="text-gray-500">{member.work}</p>
-          </div>
-        ))}
+        <div className="flex flex-wrap justify-center gap-8">
+          {teamMembers.map((member, index) => (
+            <div
+              key={index}
+              className="bg-white w-80 shadow-lg rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105"
+            >
+              {/* Image Container */}
+              <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+                <img
+                  src={member.img}
+                  alt={member.name}
+                  className="w-40 h-40 rounded-full object-cover border-4 border-gray-300"
+                />
+              </div>
+
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-gray-800">
+                  {member.name}
+                </h3>
+                <p className="text-gray-500 mt-2">{member.work}</p>
+                <div className="flex justify-center gap-4 mt-4">
+                  <a
+                    href={member.socials.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-600 hover:text-blue-800 transition"
+                  >
+                    <FaLinkedin className="text-2xl" />
+                  </a>
+                  <a
+                    href={member.socials.github}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-gray-800 hover:text-gray-900 transition"
+                  >
+                    <FaGithub className="text-2xl" />
+                  </a>
+                  <a
+                    href={member.socials.twitter}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-400 hover:text-blue-600 transition"
+                  >
+                    <FaTwitter className="text-2xl" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

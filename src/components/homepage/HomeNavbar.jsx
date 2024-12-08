@@ -55,14 +55,17 @@ const HomeNavbar = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-teal-400 via-cyan-500 to-blue-600 shadow-md w-full top-0 overflow-visible">
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center overflow-visible">
-        <Link
-          to="/"
-          className="text-2xl font-bold text-white cursor-pointer hover:text-yellow-300"
-        >
-          Codenest
+    <nav className="bg-zinc-900 shadow-md w-full top-0 overflow-visible h-24">
+      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+        {/* Logo section */}
+        <Link to="/" className="cursor-pointer relative flex items-center">
+          <img
+            src="/Logo.png"
+            alt="CodeNest"
+            className="h-16 w-auto filter drop-shadow-md transition-transform duration-300 ease-in-out transform hover:scale-110"
+          />
         </Link>
+
         <ul className="flex space-x-8 text-white text-lg">
           <li>
             <Link to="/" className="hover:text-yellow-300">

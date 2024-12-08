@@ -235,7 +235,9 @@ function TestCasesPanel() {
         message="Are you sure you want to delete this test case?"
       />
 
-      <div className="space-y-4 max-h-60 overflow-y-auto">
+      <div
+        className={`space-y-4 max-h-60 ${isLoading ? "" : "overflow-y-auto"}`}
+      >
         {isLoading ? (
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-indigo-600 border-opacity-75"></div>
