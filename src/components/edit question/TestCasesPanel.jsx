@@ -44,7 +44,7 @@ function TestCasesPanel() {
 
   // Handle API response and update testCases
   useEffect(() => {
-    if (isSuccess && Array.isArray(data?.testCases)) {
+    if (isSuccess && Array.isArray(data.testCases)) {
       setTestCases(data.testCases);
     }
   }, [isSuccess, data?.testCases]);
@@ -71,20 +71,18 @@ function TestCasesPanel() {
         };
 
         if (updateTestCaseId) {
-          // Update existing test case
           await updateTestCase({
             id: updateTestCaseId,
             data: formattedData,
           });
         } else {
-          // Add new test case
           await addTestCase({
             id: questionID,
             data: formattedData,
           });
         }
 
-        // Reset form after successful submission
+        // Reset form after submission
         setIsFormVisible(false);
         setNewTestCase({
           input: "",
@@ -92,9 +90,9 @@ function TestCasesPanel() {
           type: "Single-line",
           isHidden: false,
         });
-        setUpdateTestCaseId(null); // Clear the update ID after form reset
+        setUpdateTestCaseId(null);
       } catch (error) {
-        toast.error(error?.data?.error?.message || "Something went wrong");
+        toast.error(error.data?.error?.message || "Something went wrong");
       }
     } else {
       toast.error("Input and output are required");
@@ -106,19 +104,20 @@ function TestCasesPanel() {
     setIsModalOpen(true);
   };
 
-  const handleConfirmDelete = async () => {
-    try {
-      const res = await deleteTestCase(testCaseToDelete);
-      toast.success(res?.data?.message || "Test case successfully deleted.");
-      setTestCaseToDelete(null);
-    } catch (error) {
-      toast.error(
-        error?.data?.error?.message ||
-          "Failed to delete the test case. Please try again later."
-      );
-    } finally {
-      setIsModalOpen(false);
-    }
+  const handleConfirmDelete = () => {
+    deleteTestCase(testCaseToDelete)
+      .then((res) => {
+        toast.success(res?.data?.message || "Test case successfully deleted.");
+      })
+      .catch((error) => {
+        toast.error(
+          error?.data?.error?.message ||
+            "Failed to delete the test case. Please try again later."
+        );
+      });
+
+    setIsModalOpen(false);
+    setTestCaseToDelete(null);
   };
 
   const editTestCase = (testCase) => {
@@ -244,27 +243,47 @@ function TestCasesPanel() {
               className="bg-white p-4 rounded-md shadow flex items-start justify-between space-x-4"
             >
               <div className="flex-1">
-                <div className="font-semibold text-gray-800">{testCase.input}</div>
-                <div className="text-gray-600">{testCase.output}</div>
+                <p className="text-sm text-gray-700 mb-1">
+                  <strong>Type:</strong>
+                </p>
+                <p className="text-sm text-gray-900 mb-2">{testCase.type}</p>
+
+                <p className="text-sm text-gray-700 mb-1">
+                  <strong>Input:</strong>
+                </p>
+                <p className="text-sm text-gray-900 mb-2 whitespace-pre-wrap">
+                  {testCase.input}
+                </p>
+
+                <p className="text-sm text-gray-700 mb-1">
+                  <strong>Output:</strong>
+                </p>
+                <p className="text-sm text-gray-900 mb-2 whitespace-pre-wrap">
+                  {testCase.output}
+                </p>
+
+                <div className="text-xs text-gray-500">
+                  {testCase.isHidden ? "Hidden" : "Visible"}
+                </div>
               </div>
-              <div className="flex space-x-4 items-center">
+              <div className="flex space-x-2">
                 <button
                   onClick={() => editTestCase(testCase)}
                   className="text-blue-600 hover:text-blue-800"
                 >
-                  <AiOutlineEdit size={20} />
+                  <AiOutlineEdit />
                 </button>
                 <button
                   onClick={() => confirmRemoveTestCase(testCase._id)}
                   className="text-red-600 hover:text-red-800"
                 >
-                  <AiOutlineDelete size={20} />
+                  <AiOutlineDelete />
                 </button>
               </div>
             </div>
           ))
         ) : (
-          <div className="text-center text-gray-600">No test cases found.</div>
+          <p className="text-center text-gray-500">No test cases found.</p>
         )}
       </div>
     </div>

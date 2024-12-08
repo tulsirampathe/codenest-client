@@ -107,7 +107,7 @@ const LeaderboardOrParticipationPanel = ({
                       <th className="px-6 py-3 text-center">Rank</th>
                       <th className="px-6 py-3">Name</th>
                       <th className="px-6 py-3 text-right">Points</th>
-                      <th className="px-6 py-3 text-right">Time</th>
+                      {/* <th className="px-6 py-3 text-right">Time</th> */}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -125,9 +125,9 @@ const LeaderboardOrParticipationPanel = ({
                         <td className="px-6 py-3 text-right">
                           {participant.totalScore} pts
                         </td>
-                        <td className="px-6 py-3 text-right">
+                        {/* <td className="px-6 py-3 text-right">
                           {moment.duration(participant.timeTaken).humanize()}
-                        </td>
+                        </td> */}
                       </tr>
                     ))}
                   </tbody>
