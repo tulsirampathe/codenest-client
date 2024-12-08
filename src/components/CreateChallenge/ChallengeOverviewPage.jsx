@@ -95,14 +95,11 @@ function ChallengeOverviewPage() {
     setIsQuestionModalOpen(true);
   };
 
-  // Show/hide test case panel
-  const handleTestCaseToggle = useCallback(
-    (questionID) => {
-      // dispatch(setQuestionID(questionID));
-      setShowTestCasePanel((prevState) => !prevState);
-    },
-    [dispatch]
-  );
+ // Show/hide test case panel
+ const handleTestCaseToggle = (questionID) => {
+  dispatch(setQuestionID(questionID));
+  setShowTestCasePanel(!showTestCasePanel);
+};
   
 
   // Function to handle time conversion to UTC
