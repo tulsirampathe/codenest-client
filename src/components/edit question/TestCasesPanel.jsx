@@ -15,7 +15,7 @@ import ConfirmationDeleteModal from "../../shared/ConfirmationDeleteModal";
 function TestCasesPanel() {
   const { questionID } = useSelector((state) => state.auth);
   const [testCases, setTestCases] = useState([]);
-  const { data, isSuccess } = useGetTestCasesQuery(questionID);
+  const { data, isSuccess, isLoading } = useGetTestCasesQuery(questionID);
 
   const [addTestCase, addTestCaseStatus] = useAddTestCaseMutation();
   const [updateTestCase, updateTestCaseStatus] = useUpdateTestCaseMutation();
@@ -236,7 +236,11 @@ function TestCasesPanel() {
       />
 
       <div className="space-y-4 max-h-60 overflow-y-auto">
-        {filteredTestCases.length > 0 ? (
+        {isLoading ? (
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-indigo-600 border-opacity-75"></div>
+          </div>
+        ) : filteredTestCases.length > 0 ? (
           filteredTestCases.map((testCase) => (
             <div
               key={testCase._id}
