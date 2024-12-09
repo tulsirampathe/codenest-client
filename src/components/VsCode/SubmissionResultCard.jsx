@@ -51,33 +51,38 @@ function SubmissionResultCard({
           >
             {/* Only show Accepted/Wrong Answer if there is no ErrorMessage */}
             {!ErrorMessage && (
-              <span
-                className={`${
-                  allTestCasesPassed ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {allTestCasesPassed ? "Accepted" : "Wrong Answer"}
-              </span>
+              <>
+                <span
+                  className={`${
+                    allTestCasesPassed ? "text-green-500" : "text-red-500"
+                  }`}
+                >
+                  {allTestCasesPassed ? "Accepted" : "Wrong Answer"}
+                </span>
+                <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <strong>Test Cases:</strong> {passedTestCases}/
+                    {totalTestCases}
+                  </div>
+                  <div>
+                    <strong>SCORE:</strong> {allTestCasesPassed ? score : 0}
+                  </div>
+                  <div>
+                    <strong>Language:</strong> {language}
+                  </div>
+                  <div>
+                    <strong>Penalty:</strong> {penalty}%
+                  </div>
+                </div>
+              </>
             )}
-
-            <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <strong>Test Cases:</strong> {passedTestCases}/{totalTestCases}
-              </div>
-              <div>
-                <strong>SCORE:</strong> {allTestCasesPassed ? score : 0}
-              </div>
-              <div>
-                <strong>Language:</strong> {language}
-              </div>
-              <div>
-                <strong>Penalty:</strong> {penalty}%
-              </div>
-            </div>
 
             {/* Display ErrorMessage if it exists */}
             {ErrorMessage && (
-              <div className="mt-4 text-sm text-red-500 whitespace-pre-wrap">
+              <div
+                className="mt-4 text-sm text-red-500 whitespace-pre-wrap"
+                aria-live="assertive"
+              >
                 <strong>Error:</strong> {ErrorMessage}
               </div>
             )}
