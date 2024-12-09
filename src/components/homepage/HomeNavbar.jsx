@@ -92,7 +92,7 @@ const HomeNavbar = () => {
                 <img
                   src={user.picture}
                   alt="User picture"
-                  className="w-8 h-8 rounded-full border-2 border-white cursor-pointer"
+                  className="w-16 h-16 rounded-full border-2 border-white cursor-pointer"
                 />
               ) : (
                 <FaUserCircle className="text-white text-2xl cursor-pointer" />
