@@ -1,92 +1,87 @@
 /* eslint-disable react/prop-types */
-import React from "react";
-
 function SubmissionResultCard({
+  loading,
   totalTestCases,
   passedTestCases,
-  ErrorMessage,
-  loading,
+  score,
+  language,
+  penalty = 0,
   onClose,
+  ErrorMessage,
 }) {
   const allTestCasesPassed = passedTestCases === totalTestCases;
 
   return (
-    <div className="fixed top-0 right-0 w-full max-w-md bg-white shadow-lg rounded-lg p-6 m-4 border border-gray-300 z-50">
+    <div className="fixed top-0 right-0 w-full max-w-md bg-gray-800 text-white shadow-lg rounded-lg p-6 m-4 border border-gray-700 z-50">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">Submission Result</h2>
+        <h2 className="text-lg font-semibold">Submission Status</h2>
         <button
           onClick={onClose}
-          className="text-gray-500 hover:text-gray-700 p-1 rounded-full focus:outline-none transition duration-200"
+          className="text-gray-400 hover:text-white p-1 rounded-full focus:outline-none transition duration-200"
         >
           ✕
         </button>
       </div>
       <div className="space-y-4">
         {loading ? (
-          <div className="flex justify-center items-center h-24">
-            <svg
-              className="animate-spin h-8 w-8 text-gray-600"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-              ></path>
-            </svg>
-            <p className="ml-4 text-gray-600 font-medium">Loading...</p>
-          </div>
-        ) : ErrorMessage ? (
-          <div className="text-red-600 text-sm whitespace-pre-wrap">
-            <strong>Error:</strong> {ErrorMessage}
+          <div className="space-y-4">
+            <p className="text-sm">Hey Champ, hold on we are checking...</p>
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-center space-x-2">
+                <span>1. Compilation check</span>
+                <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <span>2. Large test cases check</span>
+                <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <span>3. Optimal code test</span>
+                <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              </li>
+            </ul>
           </div>
         ) : (
-          <>
-            <div className="text-gray-700 text-sm space-y-2">
-              <p>
-                <strong>Total Test Cases:</strong> {totalTestCases}
-              </p>
-              <p>
-                <strong>Test Cases Passed:</strong> {passedTestCases}
-              </p>
+          <div
+            className={`text-xl font-bold rounded-lg p-4 ${
+              allTestCasesPassed && !ErrorMessage
+                ? "border-2 border-green-500"
+                : "border-2 border-red-500"
+            }`}
+          >
+            {/* Only show Accepted/Wrong Answer if there is no ErrorMessage */}
+            {!ErrorMessage && (
+              <span
+                className={`${
+                  allTestCasesPassed ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                {allTestCasesPassed ? "Accepted" : "Wrong Answer"}
+              </span>
+            )}
+
+            <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <strong>Test Cases:</strong> {passedTestCases}/{totalTestCases}
+              </div>
+              <div>
+                <strong>SCORE:</strong> {allTestCasesPassed ? score : 0}
+              </div>
+              <div>
+                <strong>Language:</strong> {language}
+              </div>
+              <div>
+                <strong>Penalty:</strong> {penalty}%
+              </div>
             </div>
-            <div
-              className={`p-4 rounded-lg text-center font-semibold ${
-                allTestCasesPassed
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
-            >
-              {allTestCasesPassed ? (
-                <>
-                  <p className="text-xl">🎉 Congratulations!</p>
-                  <p className="mt-2">
-                    You nailed it! All test cases passed successfully. Keep up
-                    the amazing work! 🚀
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-xl">💪 Don't Give Up!</p>
-                  <p className="mt-2">
-                    Some test cases failed, but every great coder faces
-                    challenges. Review your solution, and you're bound to
-                    succeed! 🌟
-                  </p>
-                </>
-              )}
-            </div>
-          </>
+
+            {/* Display ErrorMessage if it exists */}
+            {ErrorMessage && (
+              <div className="mt-4 text-sm text-red-500 whitespace-pre-wrap">
+                <strong>Error:</strong> {ErrorMessage}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

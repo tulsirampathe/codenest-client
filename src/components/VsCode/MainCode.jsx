@@ -61,10 +61,9 @@ function MainCode() {
       setSubmissionResult({
         totalTestCases: data?.totalTestCases || 0,
         passedTestCases: data?.passedTestCases || 0,
-        ErrorMessage:
-        data?.errorDetails
-            ? data?.errorDetails || "An unknown error occurred."
-            : "",
+        ErrorMessage: data?.errorDetails
+          ? data?.errorDetails || "An unknown error occurred."
+          : "",
       });
     }
   }, [submitStatus.isSuccess, submitStatus.isError]);
@@ -82,7 +81,8 @@ function MainCode() {
     const handleBeforeUnload = (event) => {
       // Only show the message if the editor has content
       if (editorContent) {
-        const message = "You  have unsaved changes. Are you sure you want to leave?";
+        const message =
+          "You  have unsaved changes. Are you sure you want to leave?";
         event.returnValue = message; // Standard for most browsers
         return message; // For some older browsers
       }
@@ -174,10 +174,8 @@ function MainCode() {
       };
 
       console.log("SubData : ", submissionData);
-      
 
       await submitCode(submissionData); // Submit the code
-
     } catch (error) {
       console.error("Error during submission:", error);
       setSubmissionResult({
@@ -226,6 +224,8 @@ function MainCode() {
             ErrorMessage={submissionResult.ErrorMessage}
             loading={isSubmitLoading}
             onClose={() => setShowSubmissionResult(false)}
+            language={language}
+            score={question.maxScore}
           />
         )}
         {/* Question List */}
