@@ -55,8 +55,8 @@ const HomeNavbar = () => {
   };
 
   return (
-    <nav className="bg-zinc-900 shadow-md w-full top-0 overflow-visible h-24">
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+    <nav className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md w-full top-0 overflow-visible">
+      <div className="container mx-auto px-6 py-1 flex justify-between items-center">
         {/* Logo section */}
         <Link to="/" className="cursor-pointer relative flex items-center">
           <img
@@ -92,10 +92,10 @@ const HomeNavbar = () => {
                 <img
                   src={user.picture}
                   alt="User picture"
-                  className="w-10 h-10 rounded-full border-2 border-white cursor-pointer"
+                  className="w-8 h-8 rounded-full border-2 border-white cursor-pointer"
                 />
               ) : (
-                <FaUserCircle className="text-white text-3xl cursor-pointer" />
+                <FaUserCircle className="text-white text-2xl cursor-pointer" />
               )}
             </button>
 
