@@ -19,7 +19,7 @@ const Team = () => {
     {
       name: "Tulsiram Pathe",
       img: tulsiImg,
-      work: "Backend Developer",
+      work: "Full Stack Developer",
       socials: {
         linkedin: "https://www.linkedin.com/in/tulsiram-pathe-03b7b9258/",
         github: "https://github.com/tulsirampathe",
