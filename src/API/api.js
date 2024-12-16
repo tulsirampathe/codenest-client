@@ -7,10 +7,15 @@ const API = axios.create({
 
 const handleInputForLanguage = (input, language) => {
   if (language === "python") {
-    return input
-      .split("\n")
-      .map((line) => line.trim())
-      .join("\n");
+    // Split input by space (for space-separated values like '3 5')
+    const formattedInput = input.split("\n").map((line) => {
+      if (line.trim().includes(" ")) {
+        // Handle space-separated input in Python
+        return line.split(" ").map(value => value.trim()).join("\n"); // Split by space and join each number with a newline
+      }
+      return line.trim();
+    }).join("\n");
+    return formattedInput;
   }
 
   if (language === "javascript") {
@@ -24,6 +29,7 @@ const handleInputForLanguage = (input, language) => {
   // For Java, we don't need to change much for standard input formatting
   return input; // Default for other languages like Java
 };
+
 
 export const executeCode = async (language, sourceCode, testCases = []) => {
   try {
