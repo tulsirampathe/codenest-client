@@ -5,12 +5,32 @@ const API = axios.create({
   baseURL: "https://emkc.org/api/v2/piston",
 });
 
+const handleInputForLanguage = (input, language) => {
+  if (language === "python") {
+    return input
+      .split("\n")
+      .map((line) => line.trim())
+      .join("\n");
+  }
+
+  if (language === "javascript") {
+    // JavaScript input handling - usually string manipulation is enough
+    return input
+      .split("\n")
+      .map((line) => line.trim())
+      .join("\n");
+  }
+
+  // For Java, we don't need to change much for standard input formatting
+  return input; // Default for other languages like Java
+};
+
 export const executeCode = async (language, sourceCode, testCases = []) => {
   try {
     const results = [];
 
-
     for (const testCase of testCases) {
+      const formattedInput = handleInputForLanguage(testCase?.input, language);
 
       const response = await API.post("/execute", {
         language: language,
@@ -20,10 +40,9 @@ export const executeCode = async (language, sourceCode, testCases = []) => {
             content: sourceCode,
           },
         ],
-        stdin: testCase?.input, // Pass multiline input as stdin
+        stdin: formattedInput, // Pass formatted input
       });
 
-      
       const { run } = response.data;
       const { output, stderr, code } = run;
 
