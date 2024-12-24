@@ -14,6 +14,7 @@ import Output from "./Output";
 import QuestionDescription from "./QuestionDescription";
 import { CODE_SNIPPETS } from "../../constants/constant";
 import SubmissionResultCard from "./SubmissionResultCard";
+import { useNavigate } from "react-router-dom";
 
 function MainCode() {
   const editorRef = useRef();
@@ -21,6 +22,9 @@ function MainCode() {
     (state) => state.auth
   );
 
+  const navigate = useNavigate();
+
+  const [isMobile, setIsMobile] = useState(false);
   const [language, setLanguage] = useState("cpp");
   const [outputVisible, setOutputVisible] = useState(false);
   const [output, setOutput] = useState(null);
@@ -202,6 +206,39 @@ function MainCode() {
     setShowQuestionList(false); // Close the list explicitly
   };
 
+  // Detect screen size on load and resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); // Mobile threshold
+    };
+
+    handleResize(); // Check on component mount
+    window.addEventListener("resize", handleResize); // Listen for resize events
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if (isMobile) {
+    return (
+      <div className="w-full min-h-screen flex flex-col items-center justify-center bg-gray-100 text-center px-4">
+        <div className="p-6 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+          <h1 className="text-xl font-bold">Not Supported on Mobile</h1>
+          <p className="mt-2">
+            This platform is optimized for larger screens. Please switch to a
+            desktop or tablet for the best experience.
+          </p>
+          {/* Back Button */}
+          <button
+            onClick={() => navigate(-1)} // Go back to the previous page
+            className="mt-4 px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full min-h-screen bg-gray-100 flex flex-col items-center justify-center">
       <CodeNavbar
@@ -214,9 +251,12 @@ function MainCode() {
 
       <div
         className={`w-full h-[93vh] p-4 grid gap-6 ${
-          outputVisible ? "grid-cols-12" : "grid-cols-8"
+          outputVisible
+            ? "grid-cols-1 md:grid-cols-12"
+            : "grid-cols-1 md:grid-cols-8"
         }`}
       >
+        {/* Submission Result */}
         {showSubmissionResult && (
           <SubmissionResultCard
             totalTestCases={submissionResult.totalTestCases}
@@ -228,15 +268,16 @@ function MainCode() {
             score={question.maxScore}
           />
         )}
+
         {/* Question List */}
         {showQuestionList && (
-          <div className="absolute top-0 left-0 w-1/4 h-full bg-white shadow-lg p-4 rounded-r-lg border-r border-gray-300 z-10 overflow-y-auto">
+          <div className="absolute top-0 left-0 w-full md:w-1/4 h-full bg-white shadow-lg p-4 rounded-r-lg border-r border-gray-300 z-10 overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold text-gray-700">
                 Select Question
               </h2>
               <button
-                onClick={handleCloseQuestionList} // Explicitly handle closing
+                onClick={handleCloseQuestionList}
                 className="text-gray-500 hover:text-gray-700 p-1 rounded-full focus:outline-none transition duration-200"
               >
                 ✕
@@ -266,7 +307,7 @@ function MainCode() {
                           </p>
                         </div>
                         <button
-                          onClick={() => handleQuestionSelect(ques)} // Close list on selection
+                          onClick={() => handleQuestionSelect(ques)}
                           className={`px-4 py-1 text-sm font-medium rounded-lg transition duration-200 ${
                             isSolved
                               ? "bg-green-600 text-white hover:bg-green-700"
@@ -286,8 +327,10 @@ function MainCode() {
         {/* Question Description */}
         <div
           className={`${
-            outputVisible ? "col-span-4" : "col-span-3"
-          } h-full text-gray-900 `}
+            outputVisible
+              ? "col-span-12 md:col-span-4"
+              : "col-span-12 md:col-span-3"
+          } h-full text-gray-900 overflow-y-auto`}
         >
           <QuestionDescription QuestionData={question} />
         </div>
@@ -295,7 +338,9 @@ function MainCode() {
         {/* Code Editor */}
         <div
           className={`${
-            outputVisible ? "col-span-5" : "col-span-5"
+            outputVisible
+              ? "col-span-12 md:col-span-5"
+              : "col-span-12 md:col-span-5"
           } bg-white rounded-lg shadow-lg p-4 flex flex-col overflow-hidden`}
         >
           <div className="w-full flex justify-start px-4 py-2 text-gray-800">
@@ -304,7 +349,7 @@ function MainCode() {
           <CodeEditor
             language={language}
             value={
-              question.boilerplateCode?.[language] || CODE_SNIPPETS[language] // Default to snippet if boilerplate is empty
+              question.boilerplateCode?.[language] || CODE_SNIPPETS[language]
             }
             onChange={setEditorContent}
             onMount={onMount}
@@ -313,7 +358,7 @@ function MainCode() {
 
         {/* Output */}
         {outputVisible && (
-          <div className="col-span-3">
+          <div className="col-span-12 md:col-span-3 overflow-y-auto">
             <Output
               handleCloseOutput={handleCloseOutput}
               isLoading={isLoading}

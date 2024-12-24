@@ -7,7 +7,7 @@ import {
   useChallengeDataQuery,
   useDeleteChallengeMutation,
   useEditChallengeDataMutation,
-  useRemoveQuestionMutation
+  useRemoveQuestionMutation,
 } from "../../redux/api/api";
 import { setQuestionID } from "../../redux/reducers/auth";
 import ConfirmationDeleteModal from "../../shared/ConfirmationDeleteModal";
@@ -95,12 +95,11 @@ function ChallengeOverviewPage() {
     setIsQuestionModalOpen(true);
   };
 
- // Show/hide test case panel
- const handleTestCaseToggle = (questionID) => {
-  dispatch(setQuestionID(questionID));
-  setShowTestCasePanel(!showTestCasePanel);
-};
-  
+  // Show/hide test case panel
+  const handleTestCaseToggle = (questionID) => {
+    dispatch(setQuestionID(questionID));
+    setShowTestCasePanel(!showTestCasePanel);
+  };
 
   // Function to handle time conversion to UTC
   const convertToUTC = (localDateTime) => {
@@ -140,7 +139,7 @@ function ChallengeOverviewPage() {
   }
 
   return (
-    <div className="flex p-8 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div className="flex flex-col md:flex-row p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
       {/* Left Side: Challenge Header and Section */}
       <div className="w-full md:w-1/3 p-4">
         {/* Header */}
@@ -161,30 +160,32 @@ function ChallengeOverviewPage() {
         />
       </div>
 
+      {/* Right Side: Problem List */}
+      <div className="w-full md:w-2/3 p-4">
+        <ProblemList
+          challengeData={challengeData}
+          handleEditProblem={handleEditProblem}
+          handleDeleteProblem={handleDeleteProblem}
+          handleTestCaseToggle={handleTestCaseToggle}
+          isQuestionModalOpen={isQuestionModalOpen}
+          setIsQuestionModalOpen={setIsQuestionModalOpen}
+          DeleteProblemConform={DeleteProblemConform}
+        />
+      </div>
+
       {/* Modal for Delete Confirmation */}
       <ConfirmationDeleteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onConfirm={handleDeleteChallenge} // Call delete function on confirm
+        onConfirm={handleDeleteChallenge}
         title="Delete Challenge"
         message="Are you sure you want to delete this challenge? This action cannot be undone."
-      />
-
-      {/* Right Side: Problem List */}
-      <ProblemList
-        challengeData={challengeData}
-        handleEditProblem={handleEditProblem}
-        handleDeleteProblem={handleDeleteProblem}
-        handleTestCaseToggle={handleTestCaseToggle}
-        isQuestionModalOpen={isQuestionModalOpen}
-        setIsQuestionModalOpen={setIsQuestionModalOpen}
-        DeleteProblemConform={DeleteProblemConform}
       />
 
       {/* Floating Add Problem Button */}
       <button
         onClick={handleAddNewProblem}
-        className="fixed bottom-8 right-8 bg-indigo-600 text-white py-3 px-4 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center gap-2"
+        className="fixed bottom-4 right-4 md:bottom-8 md:right-8 bg-indigo-600 text-white py-3 px-4 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center gap-2"
       >
         <FaPlus />
         Add Question
