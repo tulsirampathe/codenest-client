@@ -78,7 +78,7 @@ Act fast— join now and showcase your skills! 💪🎯
     <button
       onClick={onClick}
       className={clsx(
-        "flex items-center gap-2 py-2 px-6 rounded-full font-medium shadow-lg transition duration-200 transform hover:scale-105 whitespace-nowrap",
+        "flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 rounded-full font-medium shadow-lg transition duration-200 transform hover:scale-105 whitespace-nowrap text-sm sm:text-base",
         {
           "bg-green-500 text-white hover:bg-green-600": color === "green",
           "bg-indigo-600 text-white hover:bg-indigo-700": color === "indigo",
@@ -86,7 +86,7 @@ Act fast— join now and showcase your skills! 💪🎯
         }
       )}
     >
-      <Icon />
+      <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
       {label}
     </button>
   );

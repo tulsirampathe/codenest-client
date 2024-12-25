@@ -13,7 +13,7 @@ const ProblemList = ({
   DeleteProblemConform,
 }) => {
   return (
-    <div className="w-full md:w-2/3 p-4">
+    <div className="w-full  p-4">
       <h2 className="text-2xl font-bold text-indigo-700">
         Challenge Questions
       </h2>
