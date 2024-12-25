@@ -65,7 +65,7 @@ Act fast— join now and showcase your skills! 💪🎯
   };
 
   const DateCard = ({ label, icon: Icon, date }) => (
-    <section className="flex flex-col items-start  bg-gradient-to-r from-indigo-200 to-indigo-300 text-indigo-800  py-4 px-6 rounded-lg font-semibold shadow-md w-full sm:w-auto max-w-xs transition duration-300 transform hover:scale-105">
+    <section className="flex flex-col items-start bg-gradient-to-r from-indigo-200 to-indigo-300 text-indigo-800 py-4 px-6 rounded-lg font-semibold shadow-md w-full sm:w-auto max-w-xs transition duration-300 transform hover:scale-105">
       <div className="flex items-center gap-2 mb-2">
         <Icon className="text-indigo-600" />
         <span className="font-bold text-indigo-700">{label}</span>
@@ -160,24 +160,25 @@ Act fast— join now and showcase your skills! 💪🎯
 
           <div className="flex flex-col sm:flex-row justify-center gap-8 text-sm text-gray-800 mb-6">
             {/* Challenge Key Card */}
-            <section className="flex items-center justify-between  bg-gradient-to-r from-indigo-200 to-indigo-300 text-indigo-800  py-4 px-6 rounded-lg font-semibold shadow-md w-full sm:w-auto max-w-xs">
-              <div className="flex items-center gap-2">
+            <section className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gradient-to-r from-indigo-200 to-indigo-300 text-indigo-800 py-4 px-6 rounded-lg font-semibold shadow-md w-full sm:w-auto max-w-xs">
+              <div className="flex items-center gap-2 mb-4 sm:mb-0">
                 <FaKey className="text-indigo-600" />
                 <span className="font-bold text-indigo-700">
                   Challenge Key:
                 </span>
-                <span className="text-gray-700 mr-2 bg-zinc-100 p-1 rounded-md">
+                <span className="text-gray-700 bg-zinc-100 p-1 rounded-md">
                   {challengeData.key}
                 </span>
               </div>
               {/* Copy Button */}
-              <ActionButton
-                label={copied ? "Copied!" : "Copy"}
-                icon={copied ? FaClipboardCheck : FaClipboard}
-                onClick={handleCopy}
-                color={copied ? "green" : "indigo"}
-                className="py-2 px-6 text-sm ml-4"
-              />
+              <div className="w-full sm:w-auto">
+                <ActionButton
+                  label={copied ? "Copied!" : "Copy"}
+                  icon={copied ? FaClipboardCheck : FaClipboard}
+                  onClick={handleCopy}
+                  color={copied ? "green" : "indigo"}
+                />
+              </div>
             </section>
           </div>
 

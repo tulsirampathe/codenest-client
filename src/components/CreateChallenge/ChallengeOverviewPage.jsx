@@ -139,7 +139,7 @@ function ChallengeOverviewPage() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div className="flex flex-col md:flex-row sm:p-4 lg:p-8 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
       {/* Left Side: Challenge Header and Section */}
       <div className="w-full md:w-1/3 p-4">
         {/* Header */}
