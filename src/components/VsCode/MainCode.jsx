@@ -271,7 +271,7 @@ function MainCode() {
 
         {/* Question List */}
         {showQuestionList && (
-          <div className="absolute top-0 left-0 w-full md:w-1/4 h-full bg-white shadow-lg p-4 rounded-r-lg border-r border-gray-300 z-10 overflow-y-auto">
+          <div className="absolute top-0 left-0 w-full md:w-1/4 h-full bg-white shadow-lg p-4 rounded-r-lg border-r border-gray-300 z-20 overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold text-gray-700">
                 Select Question
@@ -292,11 +292,13 @@ function MainCode() {
 
                   return (
                     <li
-                      key={index}
+                      key={ques._id}
                       className={`p-4 rounded-lg cursor-pointer transition duration-200 border ${
-                        ques._id === question?._id
-                          ? "bg-blue-100 text-blue-700 border-blue-500 font-semibold"
-                          : "bg-gray-100 text-gray-600 hover:bg-blue-50 hover:text-blue-700 border-gray-300"
+                        ques._id === question?._id && isSolved
+                          ? "bg-green-100 text-green-700 border-green-500 font-semibold hover:bg-green-200 hover:text-green-700"
+                          : ques._id === question?._id
+                          ? "bg-blue-100 text-blue-700 border-blue-500 font-semibold hover:bg-blue-200"
+                          : "bg-gray-100 text-gray-600 hover:bg-blue-50 hover:text-blue-700"
                       }`}
                     >
                       <div className="flex justify-between items-center">

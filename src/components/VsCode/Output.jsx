@@ -53,11 +53,11 @@ function Output({ handleCloseOutput, isLoading, ErrorMessage, output }) {
             {limitedOutput?.length > 0 ? (
               <div className="space-y-4">
                 {/* Display success message if all test cases passed */}
-                {allTestCasesPassed && (
+                {/* {allTestCasesPassed && (
                   <div className="text-green-600 text-base font-semibold bg-green-50 p-3 rounded mb-4">
                     All test cases passed
                   </div>
-                )}
+                )} */}
 
                 {/* Test Cases */}
                 <div className="bg-gray-50 rounded-lg border border-gray-200">

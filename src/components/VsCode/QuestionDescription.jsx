@@ -1,5 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
+import { BiCodeBlock } from "react-icons/bi";
+import { FiCheck } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { useGetSubmissionsQuery } from "../../redux/api/api";
 import SubmissionsTable from "./SubmissionTable";
@@ -7,7 +9,7 @@ import SubmissionsTable from "./SubmissionTable";
 function QuestionProblem({ QuestionData }) {
   const [activeTab, setActiveTab] = useState("Problem");
 
-  const { challengeID } = useSelector((state) => state.auth);
+  const { challengeID, challengeProgress } = useSelector((state) => state.auth);
 
   const { data, isLoading, isError, error } = useGetSubmissionsQuery({
     challengeID: challengeID,
@@ -18,8 +20,12 @@ function QuestionProblem({ QuestionData }) {
     setActiveTab(tab);
   };
 
+  const isSolved = challengeProgress?.solvedQuestions.some(
+    (solvedQues) => solvedQues._id === QuestionData._id
+  );
+
   return (
-    <div className="w-full h-full max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg overflow-y-auto">
+    <div className="w-full h-full max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg ">
       {/* Header Navigation */}
       <div className="sticky top-0 bg-white z-5">
         <div className="flex border-b border-gray-200 pb-3 mb-5">
@@ -46,9 +52,22 @@ function QuestionProblem({ QuestionData }) {
           <div>
             {/* Question Title and Meta Information */}
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-800 mb-1">
-                {QuestionData.title}
-              </h1>
+              <div className="flex items-center space-x-2">
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold ${
+                    isSolved ? "bg-green-500 text-white" : "bg-white text-black"
+                  }`}
+                >
+                  {isSolved ? (
+                    <FiCheck className="text-lg text-white" /> // Green checkmark icon for solved
+                  ) : (
+                    <BiCodeBlock className="text-lg text-black" /> // Coding icon for not solved
+                  )}
+                </div>
+                <h1 className="text-2xl font-bold text-gray-800 mb-1">
+                  {QuestionData.title}
+                </h1>
+              </div>
               <div className="text-sm text-gray-500 flex items-center space-x-4">
                 <span
                   className={`font-medium ${getDifficultyColor(
@@ -57,7 +76,12 @@ function QuestionProblem({ QuestionData }) {
                 >
                   {QuestionData.difficulty}
                 </span>
-                <span>{QuestionData.maxScore} points</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold">
+                    ✨ {isSolved ? QuestionData.maxScore : 0} /
+                    {QuestionData.maxScore}
+                  </span>
+                </div>
               </div>
             </div>
 
