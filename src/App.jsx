@@ -35,6 +35,7 @@ import {
 // Config
 import { config, server } from "./constants/config";
 import NotFound from "./components/NotFound";
+import HomeSkeleton from "./components/Skeletons/HomeSkeleton";
 
 function App() {
   const { host, loading, user, challengeProgress } = useSelector(
@@ -80,7 +81,8 @@ function App() {
 
   // Show Loading Spinner
   if (loading.host || loading.user) {
-    return <LoadingSpinner />;
+    // return <LoadingSpinner />;
+    return <HomeSkeleton />
   }
 
   return (
