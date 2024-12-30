@@ -54,8 +54,8 @@ function HomeSkeleton() {
 
         {/* Tabs Section */}
         <div className="flex justify-center space-x-4 sm:space-x-8 mb-6 px-4">
-          <div className="px-6 sm:px-11 py-6 bg-gray-200 rounded-md text-lg font-semibold"></div>
-          <div className="px-6 sm:px-11 py-6 bg-gray-200 rounded-md text-lg font-semibold"></div>
+          <div className="px-11 py-6 bg-gray-200 rounded-md text-lg font-semibold"></div>
+          <div className="px-11 py-6 bg-gray-200 rounded-md text-lg font-semibold"></div>
         </div>
 
         {/* Card Section */}
