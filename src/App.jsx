@@ -36,6 +36,7 @@ import {
 import { config, server } from "./constants/config";
 import NotFound from "./components/NotFound";
 import HomeSkeleton from "./components/Skeletons/HomeSkeleton";
+import MainMCQ from "./pages/MCQ/MainMCQ";
 
 function App() {
   const { host, loading, user, challengeProgress } = useSelector(
@@ -116,6 +117,9 @@ function App() {
           </Route>
           <Route path="/editor" element={<MainCode />} />
         </Route>
+
+        {/* MCQ Routes */}
+        <Route path="mcq" element={<MainMCQ />} />
 
         {/* Catch-all Route for NotFound Page */}
         <Route path="*" element={<NotFound />} />
