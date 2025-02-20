@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import MCQNavbar from "./MCQNavbar";
 import ShowQuestionList from "./ShowQuestionList";
 import ShowQuestion from "./ShowQuestion";
+import MCQNavigation from "./MCQNavigation";
 
 function MainMCQ() {
   const [showQuestionList, setShowQuestionList] = useState(false);
@@ -22,7 +23,7 @@ function MainMCQ() {
     <div className="w-full min-h-screen bg-zinc-900 flex flex-col">
       <MCQNavbar toggleQuestionList={toggleQuestionList} />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 w-full h-[92vh] gap-2 p-4 relative">
+      <div className="grid grid-cols-1 md:grid-cols-3 w-full h-[80vh] gap-2 p-4 relative">
         <div className="col-span-1 md:col-span-1  bg-zinc-800 shadow-lg rounded-lg">
           {showQuestionList ? (
             <ShowQuestionList toggleQuestionList={toggleQuestionList} />
@@ -81,6 +82,8 @@ function MainMCQ() {
           </div>
         </div>
       </div>
+
+      <MCQNavigation />
     </div>
   );
 }

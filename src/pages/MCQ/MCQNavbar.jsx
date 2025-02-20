@@ -71,22 +71,6 @@ function MCQNavbar({
         </button>
       </div>
 
-      {/* Middle Section: Run, Submit, and Language Dropdown */}
-      <div className="flex items-center space-x-6">
-        <button
-          // onClick={handleRun}
-          className="bg-green-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-green-400 transition-transform transform hover:scale-105"
-        >
-          Run
-        </button>
-        <button
-          // onClick={handleSubmit}
-          className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-400 transition-transform transform hover:scale-105"
-        >
-          Submit
-        </button>
-      </div>
-
       {/* Right Section: Timer, End Contest Button, Settings, and User Icons */}
       <div className="flex items-center space-x-6">
         <div className="text-lg">
