@@ -195,6 +195,7 @@ function MainCode() {
 
   const toggleQuestionList = () => {
     setShowQuestionList((prev) => !prev);
+    handleCloseOutput()
   };
 
   const handleQuestionSelect = (selectedQuestion) => {
