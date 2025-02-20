@@ -250,8 +250,10 @@ function MainCode() {
       />
 
       <div
-        className={`w-full h-[93vh] p-4 grid gap-6 ${
-          outputVisible
+        className={`w-full h-[93vh] p-4 grid gap-6 transition-all duration-300 ${
+          showQuestionList
+            ? "grid-cols-1 md:grid-cols-10 lg:grid-cols-10"
+            : outputVisible
             ? "grid-cols-1 md:grid-cols-12"
             : "grid-cols-1 md:grid-cols-8"
         }`}
@@ -271,7 +273,7 @@ function MainCode() {
 
         {/* Question List */}
         {showQuestionList && (
-          <div className=" top-0 left-0 w-full md:w-1/4 h-full bg-white shadow-lg p-4 rounded-r-lg border-r border-gray-300 z-20 overflow-y-auto">
+          <div className="md:col-span-2 bg-white shadow-lg p-4 rounded-r-lg border-r border-gray-300 h-full overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold text-gray-700">
                 Select Question
