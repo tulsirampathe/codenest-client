@@ -37,19 +37,6 @@ const QuizNavigation = () => {
         Submit
       </button>
 
-      {/* <div className="relative group">
-        <div className="bg-gray-800 text-gray-300 px-4 py-2 rounded-md text-sm flex items-center space-x-2">
-          <span>
-            {currentQuestion}/{totalQuestions} done
-          </span>
-          <span>|</span>
-          <span>Go to the next question</span>
-          <button className="ml-2 text-gray-400 hover:text-white">
-            <X size={16} />
-          </button>
-        </div>
-      </div> */}
-
       <button
         className={`text-orange-500 px-4 py-2 ${
           currentQuestion === totalQuestions

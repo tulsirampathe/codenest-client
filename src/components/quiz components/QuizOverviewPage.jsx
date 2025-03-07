@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useMutationToast from "../../hooks/useMutationToast";
+import AddQuizQuestion from "../../pages/quiz/AddQuizQuetion";
 import {
   useChallengeDataQuery,
   useDeleteChallengeMutation,
@@ -12,13 +13,16 @@ import {
 import { setQuestionID } from "../../redux/reducers/auth";
 import ConfirmationDeleteModal from "../../shared/ConfirmationDeleteModal";
 import LoadingSpinner from "../LoadingSpinner";
-import ChallengeHeader from "./ChallengeHeader ";
-import LeaderboardOrParticipationPanel from "./LeaderboardOrParticipationPanel";
-import ProblemList from "./ProblemList";
-import QuestionListModal from "./QuestionListModel";
-import ShowTestCasePanel from "./ShowTestCasePanel";
+import ChallengeHeader from "../CreateChallenge/ChallengeHeader ";
+import LeaderboardOrParticipationPanel from "../CreateChallenge/LeaderboardOrParticipationPanel";
+import QuizProblemList from "./QuizProblemList";
+import ShowTestCasePanel from "../CreateChallenge/ShowTestCasePanel";
+// import ChallengeHeader from "./ChallengeHeader ";
+// import LeaderboardOrParticipationPanel from "./LeaderboardOrParticipationPanel";
+// import ShowTestCasePanel from "./ShowTestCasePanel";
+// import QuizProblemList from "../quiz components/QuizProblemList";
 
-function ChallengeOverviewPage() {
+function QuizOverviewPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -59,17 +63,17 @@ function ChallengeOverviewPage() {
 
   // Close edit mode after a successful edit
   useEffect(() => {
-    if (editStatus?.isSuccess) {
+    if (editStatus.isSuccess) {
       setIsEditing(false);
     }
-  }, [editStatus?.isSuccess]);
+  }, [editStatus.isSuccess]);
 
   // Navigate to dashboard after successful deletion of challenge
   useEffect(() => {
-    if (deleteStatus?.isSuccess) {
+    if (deleteStatus.isSuccess) {
       navigate("/host-dashboard");
     }
-  }, [deleteStatus?.isSuccess]);
+  }, [deleteStatus.isSuccess]);
 
   // Clipboard copy function
   const handleCopy = async () => {
@@ -95,14 +99,11 @@ function ChallengeOverviewPage() {
     setIsQuestionModalOpen(true);
   };
 
+  // Show/hide test case panel
   const handleTestCaseToggle = (questionID) => {
-    if (!showTestCasePanel) {
-      dispatch(setQuestionID(questionID)); // Dispatch only when opening
-    }
-  
-    setShowTestCasePanel((prev) => !prev);
+    dispatch(setQuestionID(questionID));
+    setShowTestCasePanel(!showTestCasePanel);
   };
-  
 
   // Function to handle time conversion to UTC
   const convertToUTC = (localDateTime) => {
@@ -165,15 +166,7 @@ function ChallengeOverviewPage() {
 
       {/* Right Side: Problem List */}
       <div className="w-full md:w-2/3 p-4">
-        <ProblemList
-          challengeData={challengeData}
-          handleEditProblem={handleEditProblem}
-          handleDeleteProblem={handleDeleteProblem}
-          handleTestCaseToggle={handleTestCaseToggle}
-          isQuestionModalOpen={isQuestionModalOpen}
-          setIsQuestionModalOpen={setIsQuestionModalOpen}
-          DeleteProblemConform={DeleteProblemConform}
-        />
+        <QuizProblemList />
       </div>
 
       {/* Modal for Delete Confirmation */}
@@ -194,12 +187,11 @@ function ChallengeOverviewPage() {
         Add Question
       </button>
 
-      {/* Conditionally render QuestionList */}
+      {/* Conditionally render AddQuizQuestion */}
       {showQuestionList && (
-        <QuestionListModal
-          showQuestionList={showQuestionList}
-          setShowQuestionList={setShowQuestionList}
-          challengeData={challengeData}
+        <AddQuizQuestion
+          // onSubmit={handleAddQuestion} // Function to handle new question submission
+          onClose={() => setShowQuestionList(false)} 
         />
       )}
 
@@ -214,4 +206,4 @@ function ChallengeOverviewPage() {
   );
 }
 
-export default ChallengeOverviewPage;
+export default QuizOverviewPage;

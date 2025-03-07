@@ -32,7 +32,7 @@ const ChallengeHeader = ({
 
   const shareOnWhatsApp = () => {
     const message = `
-📢 *Invitation to Join the Challenge!* 
+📢 *Join the Coding Challenge.* 
   
 🔥 *Challenge Name*: ${challengeData.title}
 💡 *Description*: ${challengeData.description}
@@ -47,9 +47,6 @@ const ChallengeHeader = ({
 1️⃣ *Visit our website:*  ${import.meta.env.VITE_CLIENT}  
 2️⃣ Login or Sign up as a Student
 3️⃣ Enter the provided Challenge Key to start!
-  
-⚡ Don't miss this amazing opportunity!
-Act fast— join now and showcase your skills! 💪🎯
   
 — CodeNest
 `;

@@ -4,7 +4,7 @@ import { FaTimes } from "react-icons/fa";
 import useMutationToast from "../../hooks/useMutationToast";
 import { useCreateChallengeMutation } from "../../redux/api/api";
 
-function ChallengeSetup({ onClose }) {
+function ChallengeSetup({ onClose, challengeType }) {
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -54,7 +54,7 @@ function ChallengeSetup({ onClose }) {
         <FaTimes />
       </button>
       <h1 className="text-2xl font-bold mb-4 text-gray-800 text-center border-b border-gray-200">
-        Host Challenge Setup
+        {challengeType === "contests" ? "Coding" : "Quiz"} Challenge Setup
       </h1>
 
       {/* Challenge Setup Form */}
@@ -107,7 +107,7 @@ function ChallengeSetup({ onClose }) {
         onClick={handleCreateChallenge}
         className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition duration-300"
       >
-        Create Challenge
+        Create {challengeType === "contests" ? "Coding" : "Quiz"} Challenge
       </button>
     </div>
   );

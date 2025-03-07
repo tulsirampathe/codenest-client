@@ -2,25 +2,7 @@
 import React from "react";
 import { FaTimes } from "react-icons/fa";
 
-const problems = [
-  { id: 1, name: "Form Validation", exp: "0/10", status: "Not Attempted" },
-  {
-    id: 2,
-    name: "React - inline stylings",
-    exp: "0/10",
-    status: "Not Attempted",
-  },
-  { id: 3, name: "useState returns", exp: "0/10", status: "Not Attempted" },
-  { id: 4, name: "useReducer Hook", exp: "0/10", status: "Not Attempted" },
-  {
-    id: 5,
-    name: "React - onclick syntax",
-    exp: "0/10",
-    status: "Not Attempted",
-  },
-];
-
-const ShowQuestionList = ({ toggleQuestionList }) => {
+const ShowQuestionList = ({ toggleQuestionList, questions, handleQuestionSelect  }) => {
   return (
     <div className="w-full p-6 text-white relative">
       <button
@@ -30,14 +12,10 @@ const ShowQuestionList = ({ toggleQuestionList }) => {
         <FaTimes />
       </button>
 
-      <h2 className="text-lg font-semibold mb-2">
-        Problem of the day - <span className="text-yellow-400">MCQ</span>
-      </h2>
-
       <div className="flex justify-between items-center mt-4 bg-gray-800 p-3 rounded-lg">
         <p>
-          Total problems <span className="font-bold">5</span> • Attempted{" "}
-          <span className="font-bold">0/5</span>
+          Total problems <span className="font-bold">{questions?.length}</span> • Attempted{" "}
+          <span className="font-bold">0/{questions?.length}</span>
         </p>
         <p className="flex items-center gap-1">
           <span className="text-yellow-400">⚡</span> 0/50
@@ -56,25 +34,26 @@ const ShowQuestionList = ({ toggleQuestionList }) => {
             </tr>
           </thead>
           <tbody>
-            {problems.map((problem, index) => (
+            {questions.map((question, index) => (
               <tr
-                key={problem.id}
-                className="border-b border-gray-600 hover:bg-gray-700 transition rounded-lg"
+                key={question.id}
+                className="border-b border-gray-600 hover:bg-gray-700 transition rounded-lg cursor-pointer"
+                onClick={() => handleQuestionSelect (index)} // Set selected question
               >
                 <td className="p-3">{index + 1}</td>
-                <td className="p-3">{problem.name}</td>
+                <td className="p-3">{question.title}</td>
                 <td className="p-3 text-center text-yellow-400">
-                  {problem.exp}
+                  {question.maxScore}
                 </td>
                 <td className="p-3 text-center">
                   <span
                     className={`px-2 py-1 rounded text-sm font-semibold ${
-                      problem.status === "Solved"
-                        ? "bg-green-600 text-white"
-                        : "bg-red-600 text-white"
+                      question.status === "Solved"
+                        ? "bg-green-400 text-white"
+                        : "bg-blue-400 text-white"
                     }`}
                   >
-                    {problem.status}
+                    {question.status}
                   </span>
                 </td>
               </tr>

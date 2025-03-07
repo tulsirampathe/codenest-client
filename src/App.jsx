@@ -36,7 +36,11 @@ import {
 import { config, server } from "./constants/config";
 import NotFound from "./components/NotFound";
 import HomeSkeleton from "./components/Skeletons/HomeSkeleton";
-import MainMCQ from "./pages/MCQ/MainMCQ";
+import MainQuiz from "./pages/quiz/MainQuiz";
+import HostQuizDashboard from "./pages/quiz/HostQuizDashboard";
+// import AddQuizQuetion from "./pages/quiz/AddQuizQuetion"; 
+import MCQAdminPage from "./pages/quiz/AddQuizQuetion";
+import QuizOverviewPage from "./components/quiz components/QuizOverviewPage";
 
 function App() {
   const { host, loading, user, challengeProgress } = useSelector(
@@ -83,7 +87,7 @@ function App() {
   // Show Loading Spinner
   if (loading.host || loading.user) {
     // return <LoadingSpinner />;
-    return <HomeSkeleton />
+    return <HomeSkeleton />;
   }
 
   return (
@@ -95,13 +99,19 @@ function App() {
             <Route path="/host-dashboard" element={<HostDashboard />} />
             <Route path="/challenge-setup" element={<ChallengeSetup />} />
             <Route path="/overview" element={<ChallengeOverviewPage />} />
+
+            {/* quiz host Routes */}
+            <Route path="/quiz/overview" element={<QuizOverviewPage />} />
           </Route>
+
           <Route path="/add-question" element={<AddQuestion />} />
           <Route path="/code-editor" element={<MainCode />} />
         </Route>
 
         {/* Public Routes */}
-        <Route element={<ProtectRoute user={!host} redirect="/host-dashboard" />}>
+        <Route
+          element={<ProtectRoute user={!host} redirect="/host-dashboard" />}
+        >
           <Route element={<NotProtectedLayout />}>
             <Route path="/" element={<Body />} />
             <Route path="/about" element={<About />} />
@@ -113,13 +123,16 @@ function App() {
         {/* Participant Protected Routes */}
         <Route element={<ProtectRoute user={user} />}>
           <Route element={<UserProtectedLayout />}>
-            <Route path="/challenge-page" element={<ParticipantChallengeOverviewPage />} />
+            <Route
+              path="/challenge-page"
+              element={<ParticipantChallengeOverviewPage />}
+            />
           </Route>
           <Route path="/editor" element={<MainCode />} />
         </Route>
 
-        {/* MCQ Routes */}
-        <Route path="mcq" element={<MainMCQ />} />
+        {/* quiz user Routes */}
+        <Route path="/quiz/user-dashboard" element={<MainQuiz />} />
 
         {/* Catch-all Route for NotFound Page */}
         <Route path="*" element={<NotFound />} />

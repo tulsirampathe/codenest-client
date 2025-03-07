@@ -2,9 +2,7 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import {
   FaCalendarAlt,
-  FaCode,
   FaPlus,
-  FaQuestionCircle,
   FaTasks,
   FaUserCircle,
   FaUsers,
@@ -22,30 +20,8 @@ import {
   setChallengeID,
   setQuestionID,
 } from "../../redux/reducers/auth";
-import ContestSetup from "./ChallengeSetup";
 
-const dummyQuizData = {
-  challenges: [
-    {
-      _id: "quiz1",
-      title: "JavaScript Basics Quiz",
-      startTime: "2025-03-10T10:00:00",
-      endTime: "2025-03-10T11:00:00",
-      questions: Array(10).fill("Q"),
-      participants: Array(50).fill("P"),
-    },
-    {
-      _id: "quiz2",
-      title: "ReactJS Advanced Quiz",
-      startTime: "2025-03-12T14:00:00",
-      endTime: "2025-03-12T15:30:00",
-      questions: Array(15).fill("Q"),
-      participants: Array(100).fill("P"),
-    },
-  ],
-};
-
-function HostDashboard() {
+function HostQuizDashboard() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -55,22 +31,12 @@ function HostDashboard() {
 
   const { host } = useSelector((state) => state.auth);
 
-  const [selectedTab, setSelectedTab] = useState("contests");
-
-  const [currentChallenges, setCurrentChallenges] = useState([]);
-
   useEffect(() => {
     dispatch(setQuestionID(null));
   }, [dispatch]);
 
   const { isLoading: challengeLoading, data: myChallengesData } =
     useMyChallengesQuery("");
-
-  useEffect(() => {
-    setCurrentChallenges(
-      selectedTab === "contests" ? myChallengesData : dummyQuizData
-    );
-  }, [selectedTab, myChallengesData]);
 
   const [updateHost, { isLoading, isSuccess, data, isError, error }] =
     useUpdateHostMutation();
@@ -119,7 +85,7 @@ function HostDashboard() {
     <div className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen relative">
       <div className="flex flex-col md:flex-row">
         {/* Sidebar */}
-        <aside className="md:w-1/4 p-6 space-y-6">
+        <aside className="md:w-1/4 p-6">
           {isEditing ? (
             <div className="bg-white p-6 rounded-lg shadow-md border border-indigo-200 z-10 relative">
               <form onSubmit={handleEditDetails} className="mb-4">
@@ -129,7 +95,7 @@ function HostDashboard() {
                 <input
                   name="username"
                   defaultValue={host.username}
-                  className="w-full border border-gray-300 rounded-md p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full border border-gray-300 rounded-md p-2 mb-4 transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder="Enter new username"
                   required
                 />
@@ -152,14 +118,13 @@ function HostDashboard() {
             </div>
           ) : (
             <>
-              {/* Host Info Card */}
               <div className="bg-white p-6 rounded-lg shadow-md border border-indigo-200 z-10 relative">
                 <div className="flex items-center mb-6">
                   {host?.picture ? (
                     <img
                       src={host.picture}
                       alt="User Picture"
-                      className="w-12 h-12 rounded-full border-2 border-white cursor-pointer"
+                      className="w-10 h-10 rounded-full border-2 border-white cursor-pointer"
                     />
                   ) : (
                     <FaUserCircle className="text-indigo-600 text-6xl cursor-pointer" />
@@ -170,54 +135,15 @@ function HostDashboard() {
                     </h1>
                   </div>
                 </div>
-                <div className="flex justify-center">
+                <div className="flex justify-center gap-8 mt-6">
                   <button
                     onClick={() => setIsEditing(true)}
                     className="flex items-center gap-2 bg-indigo-600 text-white py-2 px-6 rounded-full font-medium shadow-lg hover:bg-indigo-700 hover:shadow-xl transition duration-200 transform hover:scale-105 whitespace-nowrap"
                   >
-                    <FaTasks /> Edit Details
+                    <FaTasks />
+                    Edit Details
                   </button>
                 </div>
-              </div>
-
-              {/* Coding Challenges Card */}
-              <div className="bg-gray-100 p-6 rounded-lg shadow-md border border-gray-300 mt-6">
-                <div className="flex items-center gap-3 text-indigo-600">
-                  <FaCode className="text-3xl" />
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    Coding Challenges
-                  </h2>
-                </div>
-                <p className="text-gray-600 text-sm mt-2">
-                  Create, edit, and review coding challenges. Monitor
-                  participants' submissions and performance.
-                </p>
-                <button
-                  onClick={() => setSelectedTab("contests")}
-                  className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-700 transition duration-200 w-full"
-                >
-                  Manage Challenges
-                </button>
-              </div>
-
-              {/* Quiz Challenges Card */}
-              <div className="bg-gray-100 p-6 rounded-lg shadow-md border border-gray-300 mt-6">
-                <div className="flex items-center gap-3 text-indigo-600">
-                  <FaQuestionCircle className="text-3xl" />
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    Quiz Challenges
-                  </h2>
-                </div>
-                <p className="text-gray-600 text-sm mt-2">
-                  Create, update, and oversee quiz challenges. Track
-                  participants' progress and results.
-                </p>
-                <button
-                  onClick={() => setSelectedTab("quizzes")}
-                  className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-700 transition duration-200 w-full"
-                >
-                  Manage Quizzes
-                </button>
               </div>
             </>
           )}
@@ -228,45 +154,24 @@ function HostDashboard() {
           {/* Dashboard Overview */}
           <section className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-2xl font-semibold text-indigo-700 mb-2">
-              Admin Dashboard: Coding & Quiz Challenges
+              Dashboard Overview
             </h2>
             <p className="text-gray-600">
-              Welcome, {host.username}. Oversee coding and quiz challenges,
-              create and manage contests, and track participants' progress.
-              Monitor insights to enhance engagement and performance.
+              Welcome, {host.username}. Manage contests, create events, and view
+              insights from your recent contests.
             </p>
           </section>
 
           {/* Previous Contests Section */}
           <section className="bg-white rounded-lg shadow-md p-6">
             <h3 className="text-xl font-semibold text-indigo-700 mb-4">
-              Recent{" "}
-              {selectedTab === "contests"
-                ? "Coding Contests"
-                : "Quiz Challenges"}
+              Recent Contests
             </h3>
-
             {challengeLoading ? (
               <LoadingSpinner />
-            ) : currentChallenges?.challenges?.length > 0 ? ( // ✅ Fixed Syntax
+            ) : myChallengesData?.challenges?.length > 0 ? (
               <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {/* Create New Coding Contest Card */}
-                <div
-                  className="bg-gradient-to-br from-indigo-100 to-indigo-50 border-2 border-dashed border-indigo-400 rounded-lg shadow-lg p-6 flex flex-col items-center justify-center cursor-pointer 
-             hover:shadow-xl hover:bg-indigo-100 transition-all duration-300 transform hover:scale-105 active:scale-95"
-                  onClick={handleCreateContest}
-                >
-                  <div className="bg-indigo-200 p-4 rounded-full flex items-center justify-center mb-3 transition-all duration-300 hover:bg-indigo-300 shadow-md">
-                    <FaPlus className="text-indigo-700 text-5xl" />
-                  </div>
-                  Create New{" "}
-                  {selectedTab === "contests"
-                    ? "Coding Contest"
-                    : "Quiz Challenge"}
-                </div>
-
-                {/* Existing Challenges */}
-                {currentChallenges.challenges.map((challenge) => (
+                {myChallengesData.challenges.map((challenge) => (
                   <div
                     key={challenge._id}
                     className="bg-gray-50 border border-indigo-200 rounded-lg shadow-sm p-4 hover:shadow-lg transition-shadow duration-300"
@@ -278,16 +183,14 @@ function HostDashboard() {
                       <p className="flex items-center text-gray-500 mt-2">
                         <FaCalendarAlt className="mr-2 text-indigo-600" />
                         Start:{" "}
-                        {moment(challenge.startTime).format(
-                          "DD MMMM YYYY, hh:mm A"
-                        )}
+                        {moment(challenge.startTime)
+                          .format("DD MMMM YYYY, hh:mm A")}
                       </p>
                       <p className="flex items-center text-gray-500">
                         <FaCalendarAlt className="mr-2 text-indigo-600" />
                         End:{" "}
-                        {moment(challenge.endTime).format(
-                          "DD MMMM YYYY, hh:mm A"
-                        )}
+                        {moment(challenge.endTime)
+                          .format("DD MMMM YYYY, hh:mm A")}
                       </p>
                       <div className="flex items-center justify-between mt-4 text-gray-600">
                         <p className="flex items-center">
@@ -304,50 +207,29 @@ function HostDashboard() {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center">
-                {/* Show Create New Coding Contest Card if no contests exist */}
-                <div
-                  className="bg-gradient-to-br from-indigo-100 to-indigo-50 border-2 border-dashed border-indigo-400 rounded-lg shadow-lg p-6 flex flex-col items-center justify-center cursor-pointer 
-             hover:shadow-xl hover:bg-indigo-100 transition-all duration-300 transform hover:scale-105 active:scale-95"
-                  onClick={handleCreateContest}
-                >
-                  <div className="bg-indigo-200 p-4 rounded-full flex items-center justify-center mb-3 transition-all duration-300 hover:bg-indigo-300 shadow-md">
-                    <FaPlus className="text-indigo-700 text-5xl" />
-                  </div>
-                  <h4 className="text-xl font-bold text-indigo-800 text-center">
-                    Create New{" "}
-                    {selectedTab === "contests"
-                      ? "Coding Contest"
-                      : "Quiz Challenge"}
-                  </h4>
-                </div>
-                <p className="text-gray-500 mt-4">
-                  No {selectedTab === "contests" ? "contests" : "quizzes"}{" "}
-                  available. Create a new one!
-                </p>
-              </div>
+              <p className="text-gray-500">No contests created yet.</p>
             )}
           </section>
         </main>
       </div>
 
       {/* Floating Add Problem Button */}
-      {/* <button
+      <button
         onClick={handleCreateContest}
         className="fixed bottom-8 right-8 bg-indigo-600 text-white py-3 px-4 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center gap-2"
       >
         <FaPlus />
         Create New Contest
-      </button> */}
+      </button>
 
       {/* ContestSetup Panel */}
       {showContestSetup && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-10">
-          <ContestSetup onClose={handleCloseContestSetup} challengeType={selectedTab} />
+          {/* <ContestSetu onClose={handleCloseContestSetup} /> */}
         </div>
       )}
     </div>
   );
 }
 
-export default HostDashboard;
+export default HostQuizDashboard;
