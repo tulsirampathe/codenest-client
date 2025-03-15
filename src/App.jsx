@@ -37,11 +37,13 @@ import { config, server } from "./constants/config";
 import NotFound from "./components/NotFound";
 import HomeSkeleton from "./components/Skeletons/HomeSkeleton";
 import MainQuiz from "./pages/quiz/MainQuiz";
-// import AddQuizQuetion from "./pages/quiz/AddQuizQuetion"; 
+// import AddQuizQuetion from "./pages/quiz/AddQuizQuetion";
 import MCQAdminPage from "./pages/quiz/AddQuizQuetion";
 import QuizOverviewPage from "./components/quiz components/QuizOverviewPage";
 import BatchPage from "./pages/quiz/BatchPage";
 import AddQuizQuestion from "./pages/quiz/AddQuizQuetion";
+import StudentBatchPage from "./components/UserQuiz/StudentBatchPage";
+import BatchDetailsPage from "./components/UserQuiz/BatchDetailsPage";
 
 function App() {
   const { host, loading, user, challengeProgress } = useSelector(
@@ -105,7 +107,6 @@ function App() {
             <Route path="/quiz/overview" element={<QuizOverviewPage />} />
             <Route path="/quiz/batch" element={<BatchPage />} />
             <Route path="/quiz/add-question" element={<AddQuizQuestion />} />
-
           </Route>
 
           <Route path="/add-question" element={<AddQuestion />} />
@@ -131,6 +132,8 @@ function App() {
               path="/challenge-page"
               element={<ParticipantChallengeOverviewPage />}
             />
+            <Route path="/user/quiz/overview" element={<StudentBatchPage />} />
+            <Route path="/user/batch" element={<BatchDetailsPage />} />
           </Route>
           <Route path="/editor" element={<MainCode />} />
         </Route>
