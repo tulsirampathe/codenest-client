@@ -14,36 +14,38 @@ import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import useMutationToast from "../../hooks/useMutationToast";
 import {
+  useMyBatchesQuery,
   useMyChallengesQuery,
   useUpdateHostMutation,
 } from "../../redux/api/api";
 import {
   hostExists,
+  setBatchID,
   setChallengeID,
   setQuestionID,
 } from "../../redux/reducers/auth";
 import ContestSetup from "./ChallengeSetup";
 
-const dummyQuizData = {
-  challenges: [
-    {
-      _id: "quiz1",
-      title: "JavaScript Basics Quiz",
-      startTime: "2025-03-10T10:00:00",
-      endTime: "2025-03-10T11:00:00",
-      questions: Array(10).fill("Q"),
-      participants: Array(50).fill("P"),
-    },
-    {
-      _id: "quiz2",
-      title: "ReactJS Advanced Quiz",
-      startTime: "2025-03-12T14:00:00",
-      endTime: "2025-03-12T15:30:00",
-      questions: Array(15).fill("Q"),
-      participants: Array(100).fill("P"),
-    },
-  ],
-};
+// const dummyBatchData = {
+//   batches: [
+//     {
+//       _id: "batch1",
+//       name: "Technical",
+//       description: "RB 2026 CSE All sections (6th sem)",
+//       startDate: "2025-03-08",
+//       quizs: [1, 2, 3],
+//       students: [1, 2, 3, 4, 5, 6, 7],
+//     },
+//     {
+//       _id: "batch2",
+//       name: "AI & ML",
+//       description: "RB 2026 CSE AI/ML Specialization",
+//       startDate: "2025-03-15",
+//       quizs: [1, 2, 3],
+//       students: [1, 2, 3, 4, 5, 6, 7],
+//     },
+//   ],
+// };
 
 function HostDashboard() {
   const dispatch = useDispatch();
@@ -57,7 +59,7 @@ function HostDashboard() {
 
   const [selectedTab, setSelectedTab] = useState("contests");
 
-  const [currentChallenges, setCurrentChallenges] = useState([]);
+  const [currentDataToShow, setCurrentDataToShow] = useState([]);
 
   useEffect(() => {
     dispatch(setQuestionID(null));
@@ -66,11 +68,16 @@ function HostDashboard() {
   const { isLoading: challengeLoading, data: myChallengesData } =
     useMyChallengesQuery("");
 
+  const { isLoading: batchesLoading, data: myBatchesData } =
+    useMyBatchesQuery("");
+
   useEffect(() => {
-    setCurrentChallenges(
-      selectedTab === "contests" ? myChallengesData : dummyQuizData
+    setCurrentDataToShow(
+      selectedTab === "contests"
+        ? myChallengesData?.challenges
+        : myBatchesData.batches
     );
-  }, [selectedTab, myChallengesData]);
+  }, [selectedTab, myChallengesData, myBatchesData]);
 
   const [updateHost, { isLoading, isSuccess, data, isError, error }] =
     useUpdateHostMutation();
@@ -78,6 +85,11 @@ function HostDashboard() {
   const handleChallenge = (challengeID) => {
     dispatch(setChallengeID(challengeID));
     navigate("/overview");
+  };
+
+  const handleBatch = (id) => {
+    dispatch(setBatchID(id));
+    navigate("/quiz/batch");
   };
 
   const handleCreateContest = () => {
@@ -240,93 +252,169 @@ function HostDashboard() {
           {/* Previous Contests Section */}
           <section className="bg-white rounded-lg shadow-md p-6">
             <h3 className="text-xl font-semibold text-indigo-700 mb-4">
-              Recent{" "}
               {selectedTab === "contests"
-                ? "Coding Contests"
-                : "Quiz Challenges"}
+                ? "Recent Coding Contests"
+                : "Quiz Batches"}
             </h3>
 
-            {challengeLoading ? (
-              <LoadingSpinner />
-            ) : currentChallenges?.challenges?.length > 0 ? ( // ✅ Fixed Syntax
-              <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {/* Create New Coding Contest Card */}
-                <div
-                  className="bg-gradient-to-br from-indigo-100 to-indigo-50 border-2 border-dashed border-indigo-400 rounded-lg shadow-lg p-6 flex flex-col items-center justify-center cursor-pointer 
-             hover:shadow-xl hover:bg-indigo-100 transition-all duration-300 transform hover:scale-105 active:scale-95"
-                  onClick={handleCreateContest}
-                >
-                  <div className="bg-indigo-200 p-4 rounded-full flex items-center justify-center mb-3 transition-all duration-300 hover:bg-indigo-300 shadow-md">
-                    <FaPlus className="text-indigo-700 text-5xl" />
-                  </div>
-                  Create New{" "}
-                  {selectedTab === "contests"
-                    ? "Coding Contest"
-                    : "Quiz Challenge"}
-                </div>
-
-                {/* Existing Challenges */}
-                {currentChallenges.challenges.map((challenge) => (
+            {selectedTab === "contests" &&
+              (challengeLoading ? (
+                <LoadingSpinner />
+              ) : currentDataToShow?.length > 0 ? (
+                <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                  {/* Create New Coding Contest Card */}
                   <div
-                    key={challenge._id}
-                    className="bg-gray-50 border border-indigo-200 rounded-lg shadow-sm p-4 hover:shadow-lg transition-shadow duration-300"
-                  >
-                    <button onClick={() => handleChallenge(challenge._id)}>
-                      <h4 className="text-lg font-semibold text-indigo-700">
-                        {challenge.title}
-                      </h4>
-                      <p className="flex items-center text-gray-500 mt-2">
-                        <FaCalendarAlt className="mr-2 text-indigo-600" />
-                        Start:{" "}
-                        {moment(challenge.startTime).format(
-                          "DD MMMM YYYY, hh:mm A"
-                        )}
-                      </p>
-                      <p className="flex items-center text-gray-500">
-                        <FaCalendarAlt className="mr-2 text-indigo-600" />
-                        End:{" "}
-                        {moment(challenge.endTime).format(
-                          "DD MMMM YYYY, hh:mm A"
-                        )}
-                      </p>
-                      <div className="flex items-center justify-between mt-4 text-gray-600">
-                        <p className="flex items-center">
-                          <FaTasks className="mr-2 text-blue-500" />{" "}
-                          {challenge.questions.length} Problems
-                        </p>
-                        <p className="flex items-center">
-                          <FaUsers className="mr-2 text-green-500" />{" "}
-                          {challenge.participants.length} Participants
-                        </p>
-                      </div>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center">
-                {/* Show Create New Coding Contest Card if no contests exist */}
-                <div
-                  className="bg-gradient-to-br from-indigo-100 to-indigo-50 border-2 border-dashed border-indigo-400 rounded-lg shadow-lg p-6 flex flex-col items-center justify-center cursor-pointer 
+                    className="bg-gradient-to-br from-indigo-100 to-indigo-50 border-2 border-dashed border-indigo-400 rounded-lg shadow-lg p-6 flex flex-col items-center justify-center cursor-pointer 
              hover:shadow-xl hover:bg-indigo-100 transition-all duration-300 transform hover:scale-105 active:scale-95"
-                  onClick={handleCreateContest}
-                >
-                  <div className="bg-indigo-200 p-4 rounded-full flex items-center justify-center mb-3 transition-all duration-300 hover:bg-indigo-300 shadow-md">
-                    <FaPlus className="text-indigo-700 text-5xl" />
-                  </div>
-                  <h4 className="text-xl font-bold text-indigo-800 text-center">
+                    onClick={handleCreateContest}
+                  >
+                    <div className="bg-indigo-200 p-4 rounded-full flex items-center justify-center mb-3 transition-all duration-300 hover:bg-indigo-300 shadow-md">
+                      <FaPlus className="text-indigo-700 text-5xl" />
+                    </div>
                     Create New{" "}
                     {selectedTab === "contests"
                       ? "Coding Contest"
-                      : "Quiz Challenge"}
-                  </h4>
+                      : "Quiz Batch"}
+                  </div>
+
+                  {/* Existing Challenges */}
+                  {currentDataToShow.map((challenge) => (
+                    <div
+                      key={challenge._id}
+                      className="bg-gray-50 border border-indigo-200 rounded-lg shadow-sm p-4 hover:shadow-lg transition-shadow duration-300"
+                    >
+                      <button onClick={() => handleChallenge(challenge._id)}>
+                        <h4 className="text-lg font-semibold text-indigo-700">
+                          {challenge.title}
+                        </h4>
+                        <p className="flex items-center text-gray-500 mt-2">
+                          <FaCalendarAlt className="mr-2 text-indigo-600" />
+                          Start:{" "}
+                          {moment(challenge.startTime).format(
+                            "DD MMMM YYYY, hh:mm A"
+                          )}
+                        </p>
+                        <p className="flex items-center text-gray-500">
+                          <FaCalendarAlt className="mr-2 text-indigo-600" />
+                          End:{" "}
+                          {moment(challenge.endTime).format(
+                            "DD MMMM YYYY, hh:mm A"
+                          )}
+                        </p>
+                        <div className="flex items-center justify-between mt-4 text-gray-600">
+                          <p className="flex items-center">
+                            <FaTasks className="mr-2 text-blue-500" />{" "}
+                            {challenge.questions?.length} Problems
+                          </p>
+                          <p className="flex items-center">
+                            <FaUsers className="mr-2 text-green-500" />{" "}
+                            {challenge.participants?.length} Participants
+                          </p>
+                        </div>
+                      </button>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-gray-500 mt-4">
-                  No {selectedTab === "contests" ? "contests" : "quizzes"}{" "}
-                  available. Create a new one!
-                </p>
-              </div>
-            )}
+              ) : (
+                <div className="flex flex-col items-center">
+                  {/* Show Create New Coding Contest Card if no contests exist */}
+                  <div
+                    className="bg-gradient-to-br from-indigo-100 to-indigo-50 border-2 border-dashed border-indigo-400 rounded-lg shadow-lg p-6 flex flex-col items-center justify-center cursor-pointer 
+             hover:shadow-xl hover:bg-indigo-100 transition-all duration-300 transform hover:scale-105 active:scale-95"
+                    onClick={handleCreateContest}
+                  >
+                    <div className="bg-indigo-200 p-4 rounded-full flex items-center justify-center mb-3 transition-all duration-300 hover:bg-indigo-300 shadow-md">
+                      <FaPlus className="text-indigo-700 text-5xl" />
+                    </div>
+                    <h4 className="text-xl font-bold text-indigo-800 text-center">
+                      Create New{" "}
+                      {selectedTab === "contests"
+                        ? "Coding Contest"
+                        : "Quiz Challenge"}
+                    </h4>
+                  </div>
+                  <p className="text-gray-500 mt-4">
+                    No {selectedTab === "contests" ? "contests" : "quizzes"}{" "}
+                    available. Create a new one!
+                  </p>
+                </div>
+              ))}
+
+            {selectedTab === "quizzes" &&
+              (batchesLoading ? (
+                <LoadingSpinner />
+              ) : currentDataToShow.length > 0 ? (
+                <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                  {/* Create New Coding Contest Card */}
+                  <div
+                    className="bg-gradient-to-br from-indigo-100 to-indigo-50 border-2 border-dashed border-indigo-400 rounded-lg shadow-lg p-6 flex flex-col items-center justify-center cursor-pointer 
+             hover:shadow-xl hover:bg-indigo-100 transition-all duration-300 transform hover:scale-105 active:scale-95"
+                    onClick={handleCreateContest}
+                  >
+                    <div className="bg-indigo-200 p-4 rounded-full flex items-center justify-center mb-3 transition-all duration-300 hover:bg-indigo-300 shadow-md">
+                      <FaPlus className="text-indigo-700 text-5xl" />
+                    </div>
+                    Create New Quiz Batch
+                  </div>
+
+                  {currentDataToShow.map((batch) => (
+                    <div
+                      key={batch._id}
+                      className="bg-gray-50 border border-indigo-200 rounded-lg shadow-sm p-4 hover:shadow-lg transition-shadow duration-300"
+                    >
+                      <button onClick={() => handleBatch(batch._id)}>
+                        <h4 className="text-lg font-semibold text-indigo-700">
+                          {batch.name}
+                        </h4>
+                        <p className="text-gray-600 mt-2">
+                          {batch.description}
+                        </p>
+                        <p className="flex items-center text-gray-500 mt-2">
+                          <FaCalendarAlt className="mr-2 text-indigo-600" />
+                          Start:{" "}
+                          {moment(batch.startDate).format(
+                            "DD MMMM YYYY, hh:mm A"
+                          )}
+                        </p>
+                        <div className="flex items-center justify-between mt-4 text-gray-600">
+                          <p className="flex items-center">
+                            <FaTasks className="mr-2 text-blue-500" />{" "}
+                            {batch.quizs?.length || 0} Quizs
+                          </p>
+                          <p className="flex items-center">
+                            <FaUsers className="mr-2 text-green-500" />{" "}
+                            {batch.students?.length || 0} Students
+                          </p>
+                        </div>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  {/* Show Create New Coding Contest Card if no contests exist */}
+                  <div
+                    className="bg-gradient-to-br from-indigo-100 to-indigo-50 border-2 border-dashed border-indigo-400 rounded-lg shadow-lg p-6 flex flex-col items-center justify-center cursor-pointer 
+             hover:shadow-xl hover:bg-indigo-100 transition-all duration-300 transform hover:scale-105 active:scale-95"
+                    onClick={handleCreateContest}
+                  >
+                    <div className="bg-indigo-200 p-4 rounded-full flex items-center justify-center mb-3 transition-all duration-300 hover:bg-indigo-300 shadow-md">
+                      <FaPlus className="text-indigo-700 text-5xl" />
+                    </div>
+                    <h4 className="text-xl font-bold text-indigo-800 text-center">
+                      Create New{" "}
+                      {selectedTab === "contests"
+                        ? "Coding Contest"
+                        : "Quiz Batch"}
+                    </h4>
+                  </div>
+                  <p className="text-gray-500 mt-4">
+                    No{" "}
+                    {selectedTab === "contests" ? "contests" : "quiz Batches"}{" "}
+                    available. Create a new one!
+                  </p>
+                </div>
+              ))}
           </section>
         </main>
       </div>
@@ -343,7 +431,10 @@ function HostDashboard() {
       {/* ContestSetup Panel */}
       {showContestSetup && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-10">
-          <ContestSetup onClose={handleCloseContestSetup} challengeType={selectedTab} />
+          <ContestSetup
+            onClose={handleCloseContestSetup}
+            activeMode={selectedTab}
+          />
         </div>
       )}
     </div>

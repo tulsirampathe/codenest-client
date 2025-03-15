@@ -12,6 +12,12 @@ const initialState = {
     host: false,
     user: false,
   },
+
+  //Quizzes
+  batchID: null,
+  batch: null,
+  quizID: null,
+  quiz: null
 };
 
 const authSlice = createSlice({
@@ -55,6 +61,20 @@ const authSlice = createSlice({
     setChallengeProgress: (state, action) => {
       state.challengeProgress = action.payload;
     },
+
+    // Quizzes
+    setBatchID: (state, action) => {
+      state.batchID = action.payload;
+    },
+    setBatch: (state, action) => {
+      state.batch = action.payload;
+    },
+    setQuizID: (state, action) => {
+      state.quizID = action.payload;
+    },
+    setQuiz: (state, action) => {
+      state.quiz = action.payload;
+    },
   },
 });
 
@@ -72,4 +92,10 @@ export const {
   setQuestionData,
   setChallenge,
   setChallengeProgress,
+
+  // Quizzes
+  setBatchID,
+  setBatch,
+  setQuizID,
+  setQuiz
 } = authSlice.actions;

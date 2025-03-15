@@ -16,6 +16,10 @@ const api = createApi({
     "SubmitCode",
     "Progress",
     "Leaderboard",
+    "Batches",
+    "Batch",
+    "Quiz",
+    "QuizLeaderboard"
   ],
 
   endpoints: (builder) => ({
@@ -250,7 +254,146 @@ const api = createApi({
       }),
       providesTags: ["Leaderboard"],
     }),
+
+    // Quiz APIs
+
+    myBatches: builder.query({
+      query: () => ({
+        url: "api/batches/",
+        credentials: "include",
+      }),
+      providesTags: ["Batches"],
+    }),
+
+    // Create a new batch
+    createBatche: builder.mutation({
+      query: (data) => ({
+        url: "api/batches",
+        method: "POST",
+        credentials: "include",
+        body: data,
+      }),
+      invalidatesTags: ["Batches"],
+    }),
+
+    batchData: builder.query({
+      query: (id) => ({
+        url: `api/batches/${id}`,
+        credentials: "include",
+      }),
+      providesTags: ["Batch"],
+    }),
+
+     // Edit batch data
+     editBtachData: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `api/batches/${id}`,
+        method: "PUT",
+        credentials: "include",
+        body: data,
+      }),
+      invalidatesTags: ["Batch", "Batches"],
+    }),
+
+    // Delete a batch
+    deleteBatch: builder.mutation({
+      query: (id) => ({
+        url: `api/batches/${id}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: ["Batches"], 
+    }),
+
+    // approves/rejects join requests for batch
+    batchReqests: builder.mutation({
+      query: ({id, data})=> ({
+        url: `api/batches/manageRequest/${id}`,
+        method: "POST",
+        credentials: "include",
+        body: data
+      }),
+      invalidatesTags: ["Batch"]
+    })
+,
+    quizData: builder.query({
+      query: (id) => ({
+        url: `api/quizzes/${id}`,
+        credentials: "include",
+      }),
+      providesTags: ["Quiz"],
+    }),
+
+    createQuiz: builder.mutation({
+      query: ({id, data})=> ({
+        url: `/api/quizzes/${id}`,
+        method: "POST",
+        credentials: "include",
+        body: data
+      }),
+      invalidatesTags: ["Batch"]
+    }),
+
+    // Edit quiz data
+    editQuizData: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `api/quizzes/${id}`,
+        method: "PUT",
+        credentials: "include",
+        body: data,
+      }),
+      invalidatesTags: ["Quiz"],
+    }),
+
+    // Delete a quiz
+    deleteQuiz: builder.mutation({
+      query: (id) => ({
+        url: `api/quizzes/${id}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: ["Batch"], 
+    }),
+
+    addQuestionToQuiz: builder.mutation({
+      query: (data) => ({
+        url: `/api/quiz/questions`,
+        method: "POST",
+        body: data,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Quiz"],
+    }),
+
+    editQuizQuestion: builder.mutation({
+      query: ({id, data}) => ({
+        url: `/api/quiz/questions/${id}`,
+        method: "PUT",
+        body: data,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Quiz"],
+    }),
+
+    deleteQuizQuestion: builder.mutation({
+      query: (id) => ({
+        url: `/api/quiz/questions/${id}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: ["Quiz"],
+    }),
+
+    getQuizLeaderboard: builder.query({
+      query: (id) => ({
+        url: `api/quizzes/leaderboard/${id}`,
+        credentials: "include",
+      }),
+      providesTags: ["QuizLeaderboard"],
+    }),
+
   }),
+
 });
 
 export default api;
@@ -282,4 +425,20 @@ export const {
   useGetLeaderboardQuery,
   useUserLogoutMutation,
   useHostLogoutMutation,
+
+  // Quizzes API
+  useMyBatchesQuery,
+  useCreateBatcheMutation,
+  useBatchDataQuery,
+  useEditBtachDataMutation,
+  useDeleteBatchMutation,
+  useBatchReqestsMutation,
+  useQuizDataQuery,
+  useEditQuizDataMutation,
+  useDeleteQuizMutation,
+  useAddQuestionToQuizMutation,
+  useEditQuizQuestionMutation,
+  useDeleteQuizQuestionMutation,
+  useCreateQuizMutation,
+  useGetQuizLeaderboardQuery
 } = api;

@@ -5,22 +5,15 @@ import { useNavigate } from "react-router-dom";
 import useMutationToast from "../../hooks/useMutationToast";
 import AddQuizQuestion from "../../pages/quiz/AddQuizQuetion";
 import {
-  useChallengeDataQuery,
-  useDeleteChallengeMutation,
-  useEditChallengeDataMutation,
-  useRemoveQuestionMutation,
+  useDeleteQuizMutation,
+  useEditQuizDataMutation,
+  useQuizDataQuery
 } from "../../redux/api/api";
-import { setQuestionID } from "../../redux/reducers/auth";
 import ConfirmationDeleteModal from "../../shared/ConfirmationDeleteModal";
-import LoadingSpinner from "../LoadingSpinner";
 import ChallengeHeader from "../CreateChallenge/ChallengeHeader ";
-import LeaderboardOrParticipationPanel from "../CreateChallenge/LeaderboardOrParticipationPanel";
+import LeaderboardPanel from "../CreateChallenge/LeaderboardPanel";
+import LoadingSpinner from "../LoadingSpinner";
 import QuizProblemList from "./QuizProblemList";
-import ShowTestCasePanel from "../CreateChallenge/ShowTestCasePanel";
-// import ChallengeHeader from "./ChallengeHeader ";
-// import LeaderboardOrParticipationPanel from "./LeaderboardOrParticipationPanel";
-// import ShowTestCasePanel from "./ShowTestCasePanel";
-// import QuizProblemList from "../quiz components/QuizProblemList";
 
 function QuizOverviewPage() {
   const navigate = useNavigate();
@@ -28,38 +21,29 @@ function QuizOverviewPage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
-  const [showTestCasePanel, setShowTestCasePanel] = useState(false);
   const [showQuestionList, setShowQuestionList] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [question, setQuestion] = useState("");
 
-  const { challengeID } = useSelector((state) => state.auth);
+  const { quizID } = useSelector((state) => state.auth);
 
-  const { data, isLoading: isChallengeLoading } =
-    useChallengeDataQuery(challengeID);
-  const challengeData = data?.challenge;
+  const { data, isLoading: isQuizLoading } = useQuizDataQuery(quizID);
+  const quizData = data?.quiz;
 
-  // Mutation hooks for editing and deleting challenges and questions
-  const [editChallenge, editStatus] = useEditChallengeDataMutation();
-  const [deleteChallenge, deleteStatus] = useDeleteChallengeMutation();
-  const [removeQuestion, removeStatus] = useRemoveQuestionMutation();
+  // Mutation hooks for editing and deleting quizzes and questions
+  const [editQuiz, editStatus] = useEditQuizDataMutation();
+  const [deleteQuiz, deleteStatus] = useDeleteQuizMutation();
 
   // Custom hook for handling mutation responses
   useMutationToast({
     ...editStatus,
-    successMessage:
-      editStatus.data?.message || "Challenge updated successfully",
+    successMessage: editStatus.data?.message || "Quiz updated successfully",
   });
   useMutationToast({
     ...deleteStatus,
     successMessage:
       deleteStatus.data?.message || "Challenge deleted successfully",
   });
-  useMutationToast({
-    ...removeStatus,
-    successMessage: "Question removed successfully",
-  });
+  
 
   // Close edit mode after a successful edit
   useEffect(() => {
@@ -71,38 +55,21 @@ function QuizOverviewPage() {
   // Navigate to dashboard after successful deletion of challenge
   useEffect(() => {
     if (deleteStatus.isSuccess) {
-      navigate("/host-dashboard");
+      navigate("/quiz/batch");
     }
   }, [deleteStatus.isSuccess]);
 
   // Clipboard copy function
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(challengeData.key);
+    await navigator.clipboard.writeText(quizData.key);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Edit problem handler
-  const handleEditProblem = (questionID) => {
-    dispatch(setQuestionID(questionID));
-    navigate("/add-question");
-  };
 
   // Show the modal for adding a new problem
   const handleAddNewProblem = () => {
     setShowQuestionList(true);
-  };
-
-  // Show the delete confirmation modal
-  const DeleteProblemConform = (id) => {
-    setQuestion(id);
-    setIsQuestionModalOpen(true);
-  };
-
-  // Show/hide test case panel
-  const handleTestCaseToggle = (questionID) => {
-    dispatch(setQuestionID(questionID));
-    setShowTestCasePanel(!showTestCasePanel);
   };
 
   // Function to handle time conversion to UTC
@@ -112,33 +79,25 @@ function QuizOverviewPage() {
   };
 
   // Handle challenge data editing
-  const handleEditChallengeData = async (e) => {
+  const handleEditQuizData = async (e) => {
     e.preventDefault();
-    const updatedChallengeData = {
-      title: e.target.title.value,
+    const updatedQuizData = {
+      name: e.target.title.value,
       description: e.target.description.value,
       startTime: convertToUTC(e.target.startTime.value),
       endTime: convertToUTC(e.target.endTime.value),
     };
-    await editChallenge({ id: challengeID, data: updatedChallengeData });
+    await editQuiz({ id: quizID, data: updatedQuizData });
   };
 
   // Handle challenge deletion
-  const handleDeleteChallenge = async () => {
-    await deleteChallenge(challengeID);
-    if (deleteStatus.isSuccess) {
-      navigate(-1);
-    }
+  const handleDeleteQuiz = async () => {
+    await deleteQuiz(quizID);
   };
 
-  // Handle question deletion
-  const handleDeleteProblem = async () => {
-    const data = { questionID: question };
-    await removeQuestion({ id: challengeID, data });
-  };
 
   // Loading spinner if challenge data is still loading
-  if (isChallengeLoading || !challengeData) {
+  if (isQuizLoading || !quizData) {
     return <LoadingSpinner />;
   }
 
@@ -148,34 +107,36 @@ function QuizOverviewPage() {
       <div className="w-full md:w-1/3 p-4">
         {/* Header */}
         <ChallengeHeader
-          challengeData={challengeData}
+          challengeData={quizData}
           isEditing={isEditing}
           setIsEditing={setIsEditing}
           setIsModalOpen={setIsModalOpen}
-          handleEditChallengeData={handleEditChallengeData}
+          handleEditChallengeData={handleEditQuizData}
           handleCopy={handleCopy}
           copied={copied}
+          showKey={false}
         />
 
         {/* Leaderboard and Participation Panel */}
-        <LeaderboardOrParticipationPanel
-          isChallengeLoading={isChallengeLoading}
-          challengeData={challengeData}
+        <LeaderboardPanel
+          isChallengeLoading={isQuizLoading}
+          quizData={quizData}
+          type={"quiz"}
         />
       </div>
 
       {/* Right Side: Problem List */}
       <div className="w-full md:w-2/3 p-4">
-        <QuizProblemList />
+        <QuizProblemList questions={quizData?.questions} />
       </div>
 
       {/* Modal for Delete Confirmation */}
       <ConfirmationDeleteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onConfirm={handleDeleteChallenge}
-        title="Delete Challenge"
-        message="Are you sure you want to delete this challenge? This action cannot be undone."
+        onConfirm={handleDeleteQuiz}
+        title="Delete Quiz"
+        message="Are you sure you want to delete this quiz? This action cannot be undone."
       />
 
       {/* Floating Add Problem Button */}
@@ -190,16 +151,7 @@ function QuizOverviewPage() {
       {/* Conditionally render AddQuizQuestion */}
       {showQuestionList && (
         <AddQuizQuestion
-          // onSubmit={handleAddQuestion} // Function to handle new question submission
-          onClose={() => setShowQuestionList(false)} 
-        />
-      )}
-
-      {/* Conditional Rendering of TestCasePanel in Center of Screen */}
-      {showTestCasePanel && (
-        <ShowTestCasePanel
-          handleTestCaseToggle={handleTestCaseToggle}
-          className="transition-opacity duration-300 ease-in-out opacity-100"
+          onClose={() => setShowQuestionList(false)}
         />
       )}
     </div>

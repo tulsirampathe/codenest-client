@@ -13,7 +13,7 @@ import { setQuestionID } from "../../redux/reducers/auth";
 import ConfirmationDeleteModal from "../../shared/ConfirmationDeleteModal";
 import LoadingSpinner from "../LoadingSpinner";
 import ChallengeHeader from "./ChallengeHeader ";
-import LeaderboardOrParticipationPanel from "./LeaderboardOrParticipationPanel";
+import LeaderboardPanel from "./LeaderboardPanel";
 import ProblemList from "./ProblemList";
 import QuestionListModal from "./QuestionListModel";
 import ShowTestCasePanel from "./ShowTestCasePanel";
@@ -157,9 +157,10 @@ function ChallengeOverviewPage() {
         />
 
         {/* Leaderboard and Participation Panel */}
-        <LeaderboardOrParticipationPanel
+        <LeaderboardPanel
           isChallengeLoading={isChallengeLoading}
           challengeData={challengeData}
+          type={"challenge"}
         />
       </div>
 

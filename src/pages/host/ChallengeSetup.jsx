@@ -2,31 +2,57 @@
 import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import useMutationToast from "../../hooks/useMutationToast";
-import { useCreateChallengeMutation } from "../../redux/api/api";
+import {
+  useCreateBatcheMutation,
+  useCreateChallengeMutation,
+  useCreateQuizMutation,
+} from "../../redux/api/api";
+import { useSelector } from "react-redux";
 
-function ChallengeSetup({ onClose, challengeType }) {
+function ChallengeSetup({ onClose, activeMode }) {
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [description, setDescription] = useState("");
 
-  // Destructure mutation and status properties
-  const [createChallenge, createStatus] = useCreateChallengeMutation();
+  const { batchID } = useSelector((state) => state.auth);
 
-  // Apply `useMutationToast` to handle notifications
+  let type = "";
+
+  if (activeMode === "quizzes") {
+    type = "Batch";
+  } else if (activeMode === "contests") {
+    type = "Coding Challenge";
+  } else {
+    type = "Quiz";
+  }
+
+  // Destructure mutation and status properties
+  const [createChallenge, challengeStatus] = useCreateChallengeMutation();
+  const [createBatch, batchStatus] = useCreateBatcheMutation();
+  const [createQuiz, quizStatus] = useCreateQuizMutation();
+
+  // Choose the correct mutation status based on challengeType
+  let mutationStatus;
+
+  if (type == "Batch") mutationStatus = batchStatus;
+  else if (type == "Quiz") mutationStatus = quizStatus;
+  else mutationStatus = challengeStatus;
+
+  // Apply `useMutationToast` dynamically
   useMutationToast({
-    ...createStatus,
-    loadingMessage: "Creating challenge...",
+    ...mutationStatus,
+    loadingMessage: `Creating ${type}...`,
     successMessage:
-      createStatus.data?.message || "Challenge created successfully!",
+      mutationStatus.data?.message || `${type} created successfully!`,
   });
 
   // Handle close logic after successful mutation
   useEffect(() => {
-    if (createStatus.isSuccess) {
+    if (mutationStatus.isSuccess) {
       onClose();
     }
-  }, [createStatus.isSuccess, onClose]);
+  }, [mutationStatus.isSuccess, onClose]);
 
   // Function to handle time conversion to UTC
   const convertToUTC = (localDateTime) => {
@@ -34,15 +60,68 @@ function ChallengeSetup({ onClose, challengeType }) {
     return date.toISOString(); // Converts to ISO string in UTC format
   };
 
-  const handleCreateChallenge = async () => {
-    // Convert times to UTC before sending
+  // Functions to create different challenge types
+  const handleCreateBatch = async () => {
+    const data = { name: title, description };
+    await createBatch(data).unwrap();
+  };
+
+  const handleCreateCodingChallenge = async () => {
     const data = {
       title,
       description,
       startTime: convertToUTC(startTime),
       endTime: convertToUTC(endTime),
     };
-    await createChallenge(data).unwrap(); // Unwrap to directly get the result
+    await createChallenge(data).unwrap();
+  };
+
+  const handleCreateQuestionBank = async () => {
+    const data = {
+      name: title,
+      description,
+      startTime: convertToUTC(startTime),
+      endTime: convertToUTC(endTime),
+    };
+
+    await createQuiz({ id: batchID, data }).unwrap();
+  };
+
+  const handleSubmit = async () => {
+    if (!title.trim()) {
+      alert(`${type} Name is required.`);
+      return;
+    }
+
+    if (!description.trim()) {
+      alert(`${type} Description is required.`);
+      return;
+    }
+
+    if (activeMode !== "quizzes") {
+      if (!startTime) {
+        alert("Start Time is required.");
+        return;
+      }
+
+      if (!endTime) {
+        alert("End Time is required.");
+        return;
+      }
+
+      if (new Date(startTime) >= new Date(endTime)) {
+        alert("End Time must be after Start Time.");
+        return;
+      }
+    }
+
+    if (activeMode === "quizzes") {
+      await handleCreateBatch();
+    } else if (activeMode === "contests") {
+      await handleCreateCodingChallenge();
+    } else {
+      await handleCreateQuestionBank();
+    }
   };
 
   return (
@@ -54,12 +133,12 @@ function ChallengeSetup({ onClose, challengeType }) {
         <FaTimes />
       </button>
       <h1 className="text-2xl font-bold mb-4 text-gray-800 text-center border-b border-gray-200">
-        {challengeType === "contests" ? "Coding" : "Quiz"} Challenge Setup
+        {type} Setup
       </h1>
 
       {/* Challenge Setup Form */}
       <div className="mb-4">
-        <label className="block text-gray-700">Challenge Name</label>
+        <label className="block text-gray-700">{type} Name</label>
         <input
           type="text"
           value={title}
@@ -70,30 +149,34 @@ function ChallengeSetup({ onClose, challengeType }) {
       </div>
 
       {/* Start and End Time */}
-      <div className="mb-4">
-        <label className="block text-gray-700">Start Time</label>
-        <input
-          type="datetime-local"
-          value={startTime}
-          onChange={(e) => setStartTime(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-500"
-          required
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700">End Time</label>
-        <input
-          type="datetime-local"
-          value={endTime}
-          onChange={(e) => setEndTime(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-500"
-          required
-        />
-      </div>
+      {activeMode !== "quizzes" && (
+        <>
+          <div className="mb-4">
+            <label className="block text-gray-700">Start Time</label>
+            <input
+              type="datetime-local"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-500"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">End Time</label>
+            <input
+              type="datetime-local"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-500"
+              required
+            />
+          </div>
+        </>
+      )}
 
       {/* Description */}
       <div className="mb-6">
-        <label className="block text-gray-700">Challenge Description</label>
+        <label className="block text-gray-700">{type} Description</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -104,10 +187,10 @@ function ChallengeSetup({ onClose, challengeType }) {
 
       {/* Create Challenge Button */}
       <button
-        onClick={handleCreateChallenge}
+        onClick={handleSubmit}
         className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition duration-300"
       >
-        Create {challengeType === "contests" ? "Coding" : "Quiz"} Challenge
+        Create {type}
       </button>
     </div>
   );

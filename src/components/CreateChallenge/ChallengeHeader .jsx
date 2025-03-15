@@ -19,6 +19,7 @@ const ChallengeHeader = ({
   setIsModalOpen,
   handleCopy,
   copied,
+  showKey = true,
 }) => {
   // Function to format date and time for display (e.g., "1 December 2024, 14:30")
   const formatDisplayDateTime = (date) => {
@@ -91,13 +92,13 @@ const ChallengeHeader = ({
   return (
     <header className="p-8 rounded-lg bg-white shadow-lg w-full mb-6">
       <h1 className="text-4xl font-extrabold text-indigo-700 mb-2">
-        {challengeData.title}
+        {showKey ? challengeData.title : challengeData.name}
       </h1>
       {isEditing ? (
         <form onSubmit={handleEditChallengeData} className="mb-4">
           <input
             name="title"
-            defaultValue={challengeData.title}
+            defaultValue={showKey ? challengeData.title : challengeData.name}
             className="w-full border border-gray-300 rounded-md p-2 mb-2 transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           />
@@ -121,6 +122,7 @@ const ChallengeHeader = ({
             className="w-full border border-gray-300 rounded-md p-2 mb-4 transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           />
+
           <div className="flex justify-start">
             <button
               type="submit"
@@ -155,53 +157,57 @@ const ChallengeHeader = ({
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-8 text-sm text-gray-800 mb-6">
-            {/* Challenge Key Card */}
-            <section className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gradient-to-r from-indigo-200 to-indigo-300 text-indigo-800 py-4 px-6 rounded-lg font-semibold shadow-md w-full sm:w-auto max-w-xs">
-              <div className="flex items-center gap-2 mb-4 sm:mb-0">
-                <FaKey className="text-indigo-600" />
-                <span className="font-bold text-indigo-700">
-                  Challenge Key:
-                </span>
-                <span className="text-gray-700 bg-zinc-100 p-1 rounded-md">
-                  {challengeData.key}
-                </span>
-              </div>
-              {/* Copy Button */}
-              <div className="w-full sm:w-auto">
-                <ActionButton
-                  label={copied ? "Copied!" : "Copy"}
-                  icon={copied ? FaClipboardCheck : FaClipboard}
-                  onClick={handleCopy}
-                  color={copied ? "green" : "indigo"}
-                />
-              </div>
-            </section>
-          </div>
+          {showKey && (
+            <div className="flex flex-col sm:flex-row justify-center gap-8 text-sm text-gray-800 mb-6">
+              {/* Challenge Key Card */}
+              <section className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gradient-to-r from-indigo-200 to-indigo-300 text-indigo-800 py-4 px-6 rounded-lg font-semibold shadow-md w-full sm:w-auto max-w-xs">
+                <div className="flex items-center gap-2 mb-4 sm:mb-0">
+                  <FaKey className="text-indigo-600" />
+                  <span className="font-bold text-indigo-700">
+                    Challenge Key:
+                  </span>
+                  <span className="text-gray-700 bg-zinc-100 p-1 rounded-md">
+                    {challengeData.key}
+                  </span>
+                </div>
+                {/* Copy Button */}
+                <div className="w-full sm:w-auto ml-2 ">
+                  <ActionButton
+                    label={copied ? "Copied!" : "Copy"}
+                    icon={copied ? FaClipboardCheck : FaClipboard}
+                    onClick={handleCopy}
+                    color={copied ? "green" : "indigo"}
+                  />
+                </div>
+              </section>
+            </div>
+          )}
 
           <div className="flex flex-col items-center gap-6 mt-6">
             {/* Share on WhatsApp Button */}
-            <div className="w-full flex justify-center">
-              <ActionButton
-                label="Share on WhatsApp"
-                icon={FaWhatsapp}
-                onClick={shareOnWhatsApp}
-                color="green"
-                className="w-full sm:w-auto"
-              />
-            </div>
+            {showKey && (
+              <div className="w-full flex justify-center">
+                <ActionButton
+                  label="Share on WhatsApp"
+                  icon={FaWhatsapp}
+                  onClick={shareOnWhatsApp}
+                  color="green"
+                  className="w-full sm:w-auto"
+                />
+              </div>
+            )}
 
             {/* Edit and Delete Buttons */}
             <div className="w-full flex flex-col sm:flex-row justify-center gap-4">
               <ActionButton
-                label="Edit Challenge"
+                label={`Edit ${showKey ? "Challenge" : "Quiz"}`}
                 icon={FaTasks}
                 onClick={() => setIsEditing(true)}
                 color="indigo"
                 className="flex-1 sm:flex-none"
               />
               <ActionButton
-                label="Delete Challenge"
+                label={`Delete ${showKey ? "Challenge" : "Quiz"}`}
                 icon={FaTrash}
                 onClick={() => setIsModalOpen(true)}
                 color="red"

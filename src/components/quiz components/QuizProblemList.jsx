@@ -1,50 +1,37 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import AddQuizQuestion from "../../pages/quiz/AddQuizQuetion";
+import ConfirmationDeleteModal from "../../shared/ConfirmationDeleteModal";
+import { useDeleteQuizQuestionMutation } from "../../redux/api/api";
+import useMutationToast from "../../hooks/useMutationToast";
 
-export default function QuizProblemList() {
-  const [questionsList, setQuestionsList] = useState([
-    {
-      question: "What is the capital of France?",
-      options: ["Berlin", "Madrid", "Paris", "Rome"],
-      correctAnswer: 2,
-    },
-    {
-      question:
-        "Which planet is known as the Red Planet? It has a thin atmosphere composed mostly of carbon dioxide?",
-      options: ["Earth", "Mars", "Jupiter", "Venus"],
-      correctAnswer: 1,
-    },
-    {
-      question: "Who developed the theory of relativity?",
-      options: ["Newton", "Einstein", "Tesla", "Galileo"],
-      correctAnswer: 1,
-    },
-  ]);
-
+export default function QuizProblemList({ questions }) {
   const [showForm, setShowForm] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [question, setQuestion] = useState(null);
 
-  const handleAddOrUpdateQuestion = (newQuestion) => {
-    if (editData) {
-      const updatedQuestions = questionsList.map((q) =>
-        q.question === editData.question ? newQuestion : q
-      );
-      setQuestionsList(updatedQuestions);
-    } else {
-      setQuestionsList([...questionsList, newQuestion]);
-    }
-    setEditData(null);
-    setShowForm(false);
-  };
+  const [deleteQuizQuestion, deleteStatus] = useDeleteQuizQuestionMutation();
+
+  // Custom hook for handling mutation responses
+  useMutationToast({
+    ...deleteStatus,
+    successMessage: deleteStatus.data?.message,
+  });
 
   const handleEdit = (question) => {
     setEditData(question);
     setShowForm(true);
   };
 
-  const handleDelete = (index) => {
-    setQuestionsList(questionsList.filter((_, i) => i !== index));
+  const handleDelete = (id) => {
+    setQuestion(id);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteQuizQuestion = () => {
+    deleteQuizQuestion(question);
   };
 
   return (
@@ -55,22 +42,22 @@ export default function QuizProblemList() {
 
       {/* Grid layout with uniform height cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {questionsList.map((q, index) => (
+        {questions.map((question, index) => (
           <div
             key={index}
             className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 border-l-4 border-indigo-500 flex flex-col justify-between"
           >
             {/* Question */}
             <h2 className="text-lg font-semibold text-gray-800 line-clamp-2">
-              Q{index + 1}: {q.question}
+              Q{index + 1}: {question.text}
             </h2>
 
             <div className="grid grid-cols-2 gap-2 text-gray-600 mt-4">
-              {q.options.map((opt, i) => (
+              {question.options.map((opt, i) => (
                 <div
                   key={i}
                   className={`p-3 border rounded-md text-center font-medium ${
-                    q.correctAnswer === i
+                    question.correctAnswerIndex === i
                       ? "bg-green-100 text-green-700 border-green-500 font-bold"
                       : "border-gray-300"
                   }`}
@@ -82,12 +69,18 @@ export default function QuizProblemList() {
 
             {/* Action Buttons - Always at the Bottom */}
             <div className="flex justify-between items-center mt-4">
-              <button className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold transition" onClick={() => handleEdit(q)}>
+              <button
+                className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold transition"
+                onClick={() => handleEdit(question)}
+              >
                 <FaEdit />
                 <span>Edit</span>
               </button>
 
-              <button className="flex items-center gap-2 text-red-600 hover:text-red-800 font-semibold transition" onClick={() => handleDelete(index)}>
+              <button
+                className="flex items-center gap-2 text-red-600 hover:text-red-800 font-semibold transition"
+                onClick={() => handleDelete(question._id)}
+              >
                 <FaTrash />
                 <span>Delete</span>
               </button>
@@ -98,11 +91,19 @@ export default function QuizProblemList() {
 
       {showForm && (
         <AddQuizQuestion
-          onSubmit={handleAddOrUpdateQuestion}
           onClose={() => setShowForm(false)}
           editData={editData}
         />
       )}
+
+      {/* Modal for Delete Confirmation */}
+      <ConfirmationDeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleDeleteQuizQuestion}
+        title="Delete Question"
+        message="Are you sure you want to delete this question? This action cannot be undone."
+      />
     </div>
   );
 }
