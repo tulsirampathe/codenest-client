@@ -208,7 +208,8 @@ function HostDashboard() {
                   onClick={() => setSelectedTab("contests")}
                   className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-700 transition duration-200 w-full"
                 >
-                  Manage Challenges
+                 
+                  <a href="#preData"> Manage Challenges</a>
                 </button>
               </div>
 
@@ -228,7 +229,7 @@ function HostDashboard() {
                   onClick={() => setSelectedTab("quizzes")}
                   className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-700 transition duration-200 w-full"
                 >
-                  Manage Quizzes
+                  <a href="#preData">Manage Quizzes</a>
                 </button>
               </div>
             </>
@@ -250,7 +251,7 @@ function HostDashboard() {
           </section>
 
           {/* Previous Contests Section */}
-          <section className="bg-white rounded-lg shadow-md p-6">
+          <section id="preData" className="bg-white rounded-lg shadow-md p-6">
             <h3 className="text-xl font-semibold text-indigo-700 mb-4">
               {selectedTab === "contests"
                 ? "Recent Coding Contests"

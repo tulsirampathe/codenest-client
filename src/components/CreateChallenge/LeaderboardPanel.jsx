@@ -27,6 +27,7 @@ const LeaderboardPanel = ({ type }) => {
     isLoading: isQuizLeaderboardLoading,
     refetch: refetchQuizLeaderboard,
   } = useGetQuizLeaderboardQuery(quizID, { skip: type !== "quiz" });
+  
 
   // Update leaderboard state when data is fetched
   useEffect(() => {
@@ -82,13 +83,13 @@ const LeaderboardPanel = ({ type }) => {
       type === "challenge"
         ? challengeLeaderboardData?.leaderboard?.challenge?.title ||
           "Challenge Leaderboard"
-        : quizLeaderboardData?.leaderboard?.quiz?.name || "Quiz Leaderboard";
+        : quizLeaderboardData?.leaderboard[0]?.quiz?.name || "Quiz Leaderboard";
 
     const description =
       type === "challenge"
         ? challengeLeaderboardData?.leaderboard?.challenge?.description ||
           "No description available."
-        : quizLeaderboardData?.leaderboard?.quiz?.description ||
+        : quizLeaderboardData?.leaderboard[0]?.quiz?.description ||
           "No description available.";
 
     // Add "Leaderboard" heading
