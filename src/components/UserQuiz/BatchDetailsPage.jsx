@@ -1,77 +1,177 @@
-import moment from "moment";
-import React from "react";
+/* eslint-disable react/prop-types */
+import moment from "moment-timezone";
+import React, { useState } from "react";
 import { FaBell, FaCalendar, FaCode, FaUsers } from "react-icons/fa";
+import {
+  useBatchDataQuery,
+  useQuizInitializeMutation,
+} from "../../redux/api/api";
+import { useDispatch, useSelector } from "react-redux";
+import LoadingSpinner from "../LoadingSpinner";
+import PopupModal from "../../shared/PopupModal";
+import { setQuizID } from "../../redux/reducers/auth";
+import { useNavigate } from "react-router-dom";
 
-const BatchDetailsPage = () => {
-  // Dummy data
-  const batchDetails = {
-    name: "Web Development Fundamentals",
-    code: "WEB123",
-    startDate: "2024-03-01",
-    mentor: "John Doe",
-    students: 45,
-    description:
-      "Comprehensive course covering modern web development technologies and practices.",
+// Dummy notifications
+const notifications = [
+  {
+    id: 1,
+    title: "New Quiz Added",
+    message: "HTML/CSS Basics quiz now available",
+    timestamp: "2 hours ago",
+    read: false,
+  },
+  {
+    id: 2,
+    title: "Reminder",
+    message: "JavaScript Fundamentals quiz starts tomorrow",
+    timestamp: "1 day ago",
+    read: true,
+  },
+  {
+    id: 3,
+    title: "Result Published",
+    message: "Introduction to Web quiz results available",
+    timestamp: "3 days ago",
+    read: true,
+  },
+];
+
+// Format date function
+const formatDate = (date) => moment(date).format("D MMMM YYYY");
+
+// Component for batch details
+const BatchDetailItem = ({ icon: Icon, label, value }) => (
+  <div className="flex items-center space-x-2">
+    <Icon className="text-indigo-600" />
+    <span className="text-gray-600">
+      {label}: {value}
+    </span>
+  </div>
+);
+
+// Component for quizzes
+const QuizList = ({ title, status, color, quizzes }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [quizInitialize] = useQuizInitializeMutation();
+
+  const onAccept = async () => {
+    await quizInitialize({ quizId: selectedQuiz });
+    dispatch(setQuizID(selectedQuiz));
+    navigate("/user/quiz");
   };
 
-  const quizzes = [
-    {
-      id: 1,
-      title: "HTML/CSS Basics",
-      date: "2024-03-10",
-      duration: "30 mins",
-      status: "Ongoing",
-      score: "-",
-    },
-    {
-      id: 2,
-      title: "JavaScript Fundamentals",
-      date: "2024-03-17",
-      duration: "45 mins",
-      status: "Upcoming",
-      score: "-",
-    },
-    {
-      id: 3,
-      title: "React Basics",
-      date: "2024-03-24",
-      duration: "60 mins",
-      status: "Upcoming",
-      score: "-",
-    },
-    {
-      id: 4,
-      title: "HTML/CSS Basics",
-      date: "2024-03-10",
-      duration: "30 mins",
-      status: "Completed",
-      score: 85,
-    },
-  ];
+  const handleAttemptClick = (quiz) => {
+    setSelectedQuiz(quiz); // Store the selected quiz
+    setIsModalOpen(true); // Open the modal
+  };
 
-  const notifications = [
-    {
-      id: 1,
-      title: "New Quiz Added",
-      message: "HTML/CSS Basics quiz now available",
-      timestamp: "2 hours ago",
-      read: false,
-    },
-    {
-      id: 2,
-      title: "Reminder",
-      message: "JavaScript Fundamentals quiz starts tomorrow",
-      timestamp: "1 day ago",
-      read: true,
-    },
-    {
-      id: 3,
-      title: "Result Published",
-      message: "Introduction to Web quiz results available",
-      timestamp: "3 days ago",
-      read: true,
-    },
-  ];
+  return (
+    <div className={`border-l-4 border-${color}-500`}>
+      <div className={`bg-${color}-50 px-4 py-2`}>
+        <h3 className={`font-semibold text-${color}-800`}>{title}</h3>
+      </div>
+      <div className="space-y-4 p-4">
+        {quizzes.length ? (
+          quizzes.map((quiz) => (
+            <div
+              key={quiz._id}
+              className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+            >
+              <h3 className="font-semibold text-gray-800">{quiz.name}</h3>
+              <div className="mt-3 flex flex-col items-center text-center">
+                <p
+                  className={`px-2 py-1 text-xs bg-${color}-100 text-${color}-800 rounded-full`}
+                >
+                  {quiz.status}
+                </p>
+                {status === "ongoing" ? (
+                  <>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Ends at {moment(quiz.endTime).format("DD/MM/YYYY h:mm A")}
+                    </p>
+                    <div className="relative group mt-2">
+                      <button
+                        onClick={() => handleAttemptClick(quiz._id)}
+                        className="text-sm font-semibold text-white bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                      >
+                        Attempt Quiz
+                      </button>
+                      {/* Tooltip on hover */}
+                      <div className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-3 py-1 whitespace-nowrap">
+                        Only 1 attempt allowed
+                      </div>
+                    </div>
+                  </>
+                ) : status === "upcoming" ? (
+                  <p className="text-sm text-gray-500 mt-2">
+                    Starts in{" "}
+                    {moment(quiz.startTime).format("DD/MM/YYYY h:mm A")}
+                  </p>
+                ) : (
+                  <p className="text-gray-500 text-xs mt-2">
+                    Completed on {moment(quiz.startTime).format("MMM D, YYYY")}
+                  </p>
+                )}
+              </div>
+
+              {/* Popup Modal */}
+              <PopupModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Quiz Instructions"
+                acceptText="Start Quiz"
+                onAccept={onAccept}
+              />
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500 text-sm text-center py-4">
+            No {title.toLowerCase()}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Component for notifications
+const NotificationItem = ({ notification }) => (
+  <div
+    className={`p-4 rounded-lg ${
+      !notification.read
+        ? "bg-indigo-50 border border-indigo-200"
+        : "bg-gray-50"
+    }`}
+  >
+    <div className="flex items-start space-x-3">
+      <div
+        className={`mt-1 w-2 h-2 rounded-full ${
+          !notification.read ? "bg-indigo-600" : "bg-gray-400"
+        }`}
+      />
+      <div>
+        <h3 className="font-semibold text-gray-800">{notification.title}</h3>
+        <p className="text-gray-600 text-sm">{notification.message}</p>
+        <p className="text-gray-400 text-xs mt-1">{notification.timestamp}</p>
+      </div>
+    </div>
+  </div>
+);
+
+const BatchDetailsPage = () => {
+  const { batchID, user } = useSelector((state) => state.auth);
+  const { data, isLoading } = useBatchDataQuery({batchId: batchID, userId: user._id});
+
+  if (isLoading || !data?.batch) return <LoadingSpinner />;
+
+  const { name, batchCode, startDate, students, description, quizzes } =
+    data.batch;
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -80,32 +180,25 @@ const BatchDetailsPage = () => {
         <div className="lg:col-span-2 space-y-8">
           {/* Batch Details Section */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">
-              {batchDetails.name}
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">{name}</h1>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div className="flex items-center space-x-2">
-                <FaCode className="text-indigo-600" />
-                <span className="text-gray-600">Code: {batchDetails.code}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <FaCalendar className="text-indigo-600" />
-                <span className="text-gray-600">
-                  Start Date: {batchDetails.startDate}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <FaUsers className="text-indigo-600" />
-                <span className="text-gray-600">
-                  Students: {batchDetails.students}
-                </span>
-              </div>
+              <BatchDetailItem icon={FaCode} label="Code" value={batchCode} />
+              <BatchDetailItem
+                icon={FaCalendar}
+                label="Start Date"
+                value={formatDate(startDate)}
+              />
+              <BatchDetailItem
+                icon={FaUsers}
+                label="Students"
+                value={students?.length}
+              />
             </div>
             <div className="mt-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-2">
                 Description
               </h2>
-              <p className="text-gray-600">{batchDetails.description}</p>
+              <p className="text-gray-600">{description}</p>
             </div>
           </div>
 
@@ -115,128 +208,24 @@ const BatchDetailsPage = () => {
               Batch Quizzes
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Ongoing Quizzes */}
-              <div className="border-l-4 border-green-500">
-                <div className="bg-green-50 px-4 py-2">
-                  <h3 className="font-semibold text-green-800">
-                    Ongoing Quizzes
-                  </h3>
-                </div>
-                <div className="space-y-4 p-4">
-                  {quizzes
-                    .filter((quiz) => quiz.status === "Ongoing")
-                    .map((quiz) => (
-                      <div
-                        key={quiz.id}
-                        className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
-                      >
-                        <h3 className="font-semibold text-gray-800">
-                          {quiz.title}
-                        </h3>
-                        <p className="text-gray-600 text-sm mt-1">
-                          {quiz.date} • {quiz.duration}
-                        </p>
-                        <div className="mt-3 flex items-center justify-between">
-                          <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
-                            {quiz.status}
-                          </span>
-                          <button className="text-sm text-indigo-600 hover:text-indigo-800">
-                            Start Now →
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  {quizzes.filter((quiz) => quiz.status === "Ongoing")
-                    .length === 0 && (
-                    <p className="text-gray-500 text-sm text-center py-4">
-                      No ongoing quizzes
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Upcoming Quizzes */}
-              <div className="border-l-4 border-blue-500">
-                <div className="bg-blue-50 px-4 py-2">
-                  <h3 className="font-semibold text-blue-800">
-                    Upcoming Quizzes
-                  </h3>
-                </div>
-                <div className="space-y-4 p-4">
-                  {quizzes
-                    .filter((quiz) => quiz.status === "Upcoming")
-                    .map((quiz) => (
-                      <div
-                        key={quiz.id}
-                        className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
-                      >
-                        <h3 className="font-semibold text-gray-800">
-                          {quiz.title}
-                        </h3>
-                        <p className="text-gray-600 text-sm mt-1">
-                          {quiz.date} • {quiz.duration}
-                        </p>
-                        <div className="mt-3 flex items-center justify-between">
-                          <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
-                            {quiz.status}
-                          </span>
-                          <span className="text-sm text-gray-500">
-                            Starts in {moment(quiz.date).fromNow(true)}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  {quizzes.filter((quiz) => quiz.status === "Upcoming")
-                    .length === 0 && (
-                    <p className="text-gray-500 text-sm text-center py-4">
-                      No upcoming quizzes
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Completed Quizzes */}
-              <div className="border-l-4 border-purple-500">
-                <div className="bg-purple-50 px-4 py-2">
-                  <h3 className="font-semibold text-purple-800">
-                    Completed Quizzes
-                  </h3>
-                </div>
-                <div className="space-y-4 p-4">
-                  {quizzes
-                    .filter((quiz) => quiz.status === "Completed")
-                    .map((quiz) => (
-                      <div
-                        key={quiz.id}
-                        className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
-                      >
-                        <h3 className="font-semibold text-gray-800">
-                          {quiz.title}
-                        </h3>
-                        <div className="mt-2 flex items-center justify-between">
-                          <div>
-                            <p className="text-gray-600 text-sm">Score</p>
-                            <div className="text-lg font-bold text-purple-600">
-                              {quiz.score}/100
-                            </div>
-                          </div>
-                          <button className="text-sm text-indigo-600 hover:text-indigo-800">
-                            View Results →
-                          </button>
-                        </div>
-                        <p className="text-gray-500 text-xs mt-2">
-                          Completed on {moment(quiz.date).format("MMM D, YYYY")}
-                        </p>
-                      </div>
-                    ))}
-                  {quizzes.filter((quiz) => quiz.status === "Completed")
-                    .length === 0 && (
-                    <p className="text-gray-500 text-sm text-center py-4">
-                      No completed quizzes
-                    </p>
-                  )}
-                </div>
-              </div>
+              <QuizList
+                title="Ongoing Quizzes"
+                status="ongoing"
+                color="green"
+                quizzes={quizzes.filter((q) => q.status === "ongoing")}
+              />
+              <QuizList
+                title="Upcoming Quizzes"
+                status="upcoming"
+                color="blue"
+                quizzes={quizzes.filter((q) => q.status === "upcoming")}
+              />
+              <QuizList
+                title="Completed Quizzes"
+                status="completed"
+                color="purple"
+                quizzes={quizzes.filter((q) => q.status === "completed")}
+              />
             </div>
           </div>
         </div>
@@ -244,38 +233,11 @@ const BatchDetailsPage = () => {
         {/* Notifications Sidebar */}
         <div className="bg-white rounded-2xl shadow-sm p-6 h-fit lg:sticky lg:top-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-            <FaBell className="text-indigo-600 mr-2" />
-            Notifications
+            <FaBell className="text-indigo-600 mr-2" /> Notifications
           </h2>
           <div className="space-y-4">
-            {notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`p-4 rounded-lg ${
-                  !notification.read
-                    ? "bg-indigo-50 border border-indigo-200"
-                    : "bg-gray-50"
-                }`}
-              >
-                <div className="flex items-start space-x-3">
-                  <div
-                    className={`mt-1 w-2 h-2 rounded-full ${
-                      !notification.read ? "bg-indigo-600" : "bg-gray-400"
-                    }`}
-                  />
-                  <div>
-                    <h3 className="font-semibold text-gray-800">
-                      {notification.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm">
-                      {notification.message}
-                    </p>
-                    <p className="text-gray-400 text-xs mt-1">
-                      {notification.timestamp}
-                    </p>
-                  </div>
-                </div>
-              </div>
+            {notifications.map((notif) => (
+              <NotificationItem key={notif.id} notification={notif} />
             ))}
           </div>
         </div>

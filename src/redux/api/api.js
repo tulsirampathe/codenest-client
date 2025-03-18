@@ -19,7 +19,8 @@ const api = createApi({
     "Batches",
     "Batch",
     "Quiz",
-    "QuizLeaderboard"
+    "QuizLeaderboard",
+    "UserQuizSubmission",
   ],
 
   endpoints: (builder) => ({
@@ -276,16 +277,26 @@ const api = createApi({
       invalidatesTags: ["Batches"],
     }),
 
+    // Create a new batch
+    joinBatchReq: builder.mutation({
+      query: (data) => ({
+        url: "api/batches/join",
+        method: "POST",
+        credentials: "include",
+        body: data,
+      }),
+    }),
+
     batchData: builder.query({
-      query: (id) => ({
-        url: `api/batches/${id}`,
+      query: ({ batchId, userId }) => ({
+        url: `api/batches/${batchId}?userId=${userId}`, 
         credentials: "include",
       }),
       providesTags: ["Batch"],
     }),
 
-     // Edit batch data
-     editBtachData: builder.mutation({
+    // Edit batch data
+    editBtachData: builder.mutation({
       query: ({ id, data }) => ({
         url: `api/batches/${id}`,
         method: "PUT",
@@ -302,20 +313,19 @@ const api = createApi({
         method: "DELETE",
         credentials: "include",
       }),
-      invalidatesTags: ["Batches"], 
+      invalidatesTags: ["Batches"],
     }),
 
     // approves/rejects join requests for batch
     batchReqests: builder.mutation({
-      query: ({id, data})=> ({
+      query: ({ id, data }) => ({
         url: `api/batches/manageRequest/${id}`,
         method: "POST",
         credentials: "include",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ["Batch"]
-    })
-,
+      invalidatesTags: ["Batch"],
+    }),
     quizData: builder.query({
       query: (id) => ({
         url: `api/quizzes/${id}`,
@@ -325,13 +335,13 @@ const api = createApi({
     }),
 
     createQuiz: builder.mutation({
-      query: ({id, data})=> ({
+      query: ({ id, data }) => ({
         url: `/api/quizzes/${id}`,
         method: "POST",
         credentials: "include",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ["Batch"]
+      invalidatesTags: ["Batch"],
     }),
 
     // Edit quiz data
@@ -352,7 +362,7 @@ const api = createApi({
         method: "DELETE",
         credentials: "include",
       }),
-      invalidatesTags: ["Batch"], 
+      invalidatesTags: ["Batch"],
     }),
 
     addQuestionToQuiz: builder.mutation({
@@ -366,7 +376,7 @@ const api = createApi({
     }),
 
     editQuizQuestion: builder.mutation({
-      query: ({id, data}) => ({
+      query: ({ id, data }) => ({
         url: `/api/quiz/questions/${id}`,
         method: "PUT",
         body: data,
@@ -392,8 +402,34 @@ const api = createApi({
       providesTags: ["QuizLeaderboard"],
     }),
 
-  }),
+    quizInitialize: builder.mutation({
+      query: (data) => ({
+        url: "api/quizzes/sumbission/initialize",
+        method: "POST",
+        body: data,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Batch"],
+    }),
 
+    submitQuizQuestion: builder.mutation({
+      query: (data) => ({
+        url: "api/quiz/questions/submit",
+        method: "POST",
+        body: data,
+        credentials: "include",
+      }),
+      invalidatesTags: ["UserQuizSubmission"],
+    }),
+
+    getUserQuizSubmission: builder.query({
+      query: ({ userId, quizId }) => ({
+        url: `api/quizzes/submit/user/${userId}/quiz/${quizId}`,
+        credentials: "include",
+      }),
+      providesTags: ["UserQuizSubmission"],
+    }),
+  }),
 });
 
 export default api;
@@ -431,6 +467,7 @@ export const {
   useCreateBatcheMutation,
   useBatchDataQuery,
   useEditBtachDataMutation,
+  useJoinBatchReqMutation,
   useDeleteBatchMutation,
   useBatchReqestsMutation,
   useQuizDataQuery,
@@ -440,5 +477,8 @@ export const {
   useEditQuizQuestionMutation,
   useDeleteQuizQuestionMutation,
   useCreateQuizMutation,
-  useGetQuizLeaderboardQuery
+  useGetQuizLeaderboardQuery,
+  useSubmitQuizQuestionMutation,
+  useGetUserQuizSubmissionQuery,
+  useQuizInitializeMutation,
 } = api;

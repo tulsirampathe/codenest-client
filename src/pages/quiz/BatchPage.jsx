@@ -259,7 +259,7 @@ function BatchPage() {
 
   const { batchID } = useSelector((state) => state.auth);
 
-  const { data, isLoading: isBatchLoding } = useBatchDataQuery(batchID);
+  const { data, isLoading: isBatchLoding } = useBatchDataQuery({batchId: batchID});
 
   const batchData = data?.batch;
 

@@ -27,7 +27,7 @@ const BatchHeader = ({ batchData }) => {
     description: batchData.description,
   });
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [editBatch, editStatus] = useEditBtachDataMutation();
   const [deleteBatch, deleteStatus] = useDeleteBatchMutation();
@@ -36,7 +36,7 @@ const BatchHeader = ({ batchData }) => {
     ...editStatus,
     successMessage: editStatus.data?.message || "Batch updated successfully",
   });
-  
+
   useMutationToast({
     ...deleteStatus,
     successMessage: deleteStatus.data?.message || "Batch deleted successfully",
@@ -158,7 +158,7 @@ const BatchHeader = ({ batchData }) => {
             <DateCard
               label="Start Date"
               icon={FaCalendarAlt}
-              date={batchData.startTime}
+              date={batchData.startDate}
             />
           </div>
 

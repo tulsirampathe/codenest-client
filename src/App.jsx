@@ -132,14 +132,12 @@ function App() {
               path="/challenge-page"
               element={<ParticipantChallengeOverviewPage />}
             />
-            <Route path="/user/quiz/overview" element={<StudentBatchPage />} />
+            <Route path="/user/quiz/dashboard" element={<StudentBatchPage />} />
             <Route path="/user/batch" element={<BatchDetailsPage />} />
           </Route>
+            <Route path="/user/quiz" element={<MainQuiz />} />
           <Route path="/editor" element={<MainCode />} />
         </Route>
-
-        {/* quiz user Routes */}
-        <Route path="/quiz/user-dashboard" element={<MainQuiz />} />
 
         {/* Catch-all Route for NotFound Page */}
         <Route path="*" element={<NotFound />} />

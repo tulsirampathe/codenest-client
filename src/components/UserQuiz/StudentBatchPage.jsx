@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaClock,
   FaUserGraduate,
@@ -11,6 +11,10 @@ import {
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { setBatchID } from "../../redux/reducers/auth";
+import { useJoinBatchReqMutation } from "../../redux/api/api";
+import useMutationToast from "../../hooks/useMutationToast";
 
 const sections = [
   { name: "Batches", icon: <FaUserGraduate size={20} /> },
@@ -50,19 +54,38 @@ const dummyPendingRequests = [
   },
 ];
 
-const JoinBatchModal = ({ onClose, onJoin }) => {
+const JoinBatchModal = ({ onClose, setPendingRequests }) => {
   const [code, setCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const [joinBatchReq, reqStatus] = useJoinBatchReqMutation();
+
+  // Custom hook for handling mutation responses
+  useMutationToast({
+    ...reqStatus,
+    successMessage: reqStatus.data?.message,
+  });
+
+  useEffect(() => {
+    if (reqStatus?.isSuccess) {
+      setIsSubmitting(false);
+
+      setPendingRequests(reqStatus?.data?.pendingRequests);
+      onClose();
+    }
+  }, [reqStatus?.isSuccess]);
+
+  useEffect(() => {
+    if (reqStatus?.error) {
+      setIsSubmitting(false);
+    }
+  }, [reqStatus?.error]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      onJoin(code);
-      setIsSubmitting(false);
-      onClose();
-    }, 1000);
+
+    await joinBatchReq({ batchCode: code });
   };
 
   return (
@@ -92,7 +115,7 @@ const JoinBatchModal = ({ onClose, onJoin }) => {
             <input
               type="text"
               value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              onChange={(e) => setCode(e.target.value)}
               placeholder="Enter Batch Code"
               className="w-full px-4 py-3 rounded-lg border-2 border-indigo-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
               required
@@ -127,12 +150,14 @@ const PendingRequestsStudent = ({ requests }) => {
           <div className="max-w-xs mx-auto mb-4">
             {/* Add your 3D illustration here */}
             <div className="bg-indigo-600 w-full h-48 rounded-xl mb-4 flex items-center justify-center">
-              <span className="text-gray-900 text-2xl font-bold animate-bounce">No pending join requests</span>
+              <span className="text-gray-900 text-2xl font-bold animate-bounce">
+                No pending join requests
+              </span>
             </div>
           </div>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {requests.map((request) => (
             <div
               key={request._id}
@@ -144,7 +169,7 @@ const PendingRequestsStudent = ({ requests }) => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800">
-                    {request.batchName}
+                    {request.name}
                   </h3>
                   <p className="text-yellow-600 text-sm">Pending Approval</p>
                 </div>
@@ -159,16 +184,23 @@ const PendingRequestsStudent = ({ requests }) => {
 
 const YourBatches = ({ batches, onOpenJoin }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleBatchClick = (batchId) => {
-    navigate(`/batch/${batchId}`);
+    dispatch(setBatchID(batchId));
+    navigate("/user/batch");
   };
 
   // Correct filtering logic
   const filteredBatches = batches.filter((batch) =>
-    batch.name.toLowerCase().includes(searchQuery.toLowerCase())
+    batch?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const formatDisplayDateTime = (date) => {
+    return moment(date).format("D MMMM YYYY");
+  };
 
   return (
     <div className="relative">
@@ -205,7 +237,9 @@ const YourBatches = ({ batches, onOpenJoin }) => {
         <div className="text-center py-12">
           <div className="max-w-xs mx-auto mb-4">
             <div className="bg-indigo-600 w-full h-48 rounded-xl mb-4 flex items-center justify-center">
-              <span className="text-2xl text-gray-900 font-bold animate-bounce">No batches found</span>
+              <span className="text-2xl text-gray-900 font-bold animate-bounce">
+              No batches available!
+              </span>
             </div>
           </div>
           <p className="text-gray-600">
@@ -232,11 +266,11 @@ const YourBatches = ({ batches, onOpenJoin }) => {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div className="flex items-center text-gray-500">
                       <span className="font-medium mr-2">Start Date:</span>
-                      {batch.startDate}
+                      {formatDisplayDateTime(batch.startDate)}
                     </div>
                     <div className="flex items-center text-gray-500">
                       <span className="font-medium mr-2">Batch Code:</span>
-                      {batch.code}
+                      {batch.batchCode}
                     </div>
                   </div>
                 </div>
@@ -262,14 +296,11 @@ const YourBatches = ({ batches, onOpenJoin }) => {
 // Modified StudentBatchPage
 function StudentBatchPage() {
   const navigate = useNavigate();
-  const [showJoinModal, setShowJoinModal] = useState(false);
-  const [enrolledBatches] = useState(dummyBatches);
-  const [pendingRequests] = useState(dummyPendingRequests);
 
-  const handleBatchDetails = (batchId) => {
-    const batch = dummyBatches.find((b) => b._id === batchId);
-    navigate(`/batch/${batchId}`, { state: { batch } });
-  };
+  const { user } = useSelector((state) => state.auth);
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [enrolledBatches] = useState(user?.batches);
+  const [pendingRequests, setPendingRequests] = useState(user?.pendingRequests);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-8">
@@ -297,7 +328,6 @@ function StudentBatchPage() {
             <YourBatches
               batches={enrolledBatches}
               onOpenJoin={() => setShowJoinModal(true)}
-              handleBatchClick={handleBatchDetails}
             />
           )}
         </div>
@@ -305,7 +335,7 @@ function StudentBatchPage() {
         {showJoinModal && (
           <JoinBatchModal
             onClose={() => setShowJoinModal(false)}
-            onJoin={(code) => console.log("Join batch with code:", code)}
+            setPendingRequests={setPendingRequests}
           />
         )}
       </div>
