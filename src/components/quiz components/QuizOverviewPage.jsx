@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { FaPlus } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
+import { FaFileUpload, FaPlus } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useMutationToast from "../../hooks/useMutationToast";
 import AddQuizQuestion from "../../pages/quiz/AddQuizQuetion";
 import {
   useDeleteQuizMutation,
   useEditQuizDataMutation,
-  useQuizDataQuery
+  useQuizDataQuery,
 } from "../../redux/api/api";
 import ConfirmationDeleteModal from "../../shared/ConfirmationDeleteModal";
 import ChallengeHeader from "../CreateChallenge/ChallengeHeader ";
@@ -17,7 +17,6 @@ import QuizProblemList from "./QuizProblemList";
 
 function QuizOverviewPage() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,7 +42,6 @@ function QuizOverviewPage() {
     successMessage:
       deleteStatus.data?.message || "Challenge deleted successfully",
   });
-  
 
   // Close edit mode after a successful edit
   useEffect(() => {
@@ -65,7 +63,6 @@ function QuizOverviewPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
 
   // Show the modal for adding a new problem
   const handleAddNewProblem = () => {
@@ -95,6 +92,9 @@ function QuizOverviewPage() {
     await deleteQuiz(quizID);
   };
 
+  const handleWorldDocClick = () => {
+    navigate("/quiz/uploadWordDoc");
+  };
 
   // Loading spinner if challenge data is still loading
   if (isQuizLoading || !quizData) {
@@ -139,20 +139,32 @@ function QuizOverviewPage() {
         message="Are you sure you want to delete this quiz? This action cannot be undone."
       />
 
-      {/* Floating Add Problem Button */}
-      <button
-        onClick={handleAddNewProblem}
-        className="fixed bottom-4 right-4 md:bottom-8 md:right-8 bg-indigo-600 text-white py-3 px-4 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center gap-2"
-      >
-        <FaPlus />
-        Add Question
-      </button>
+      {/* Floating Button Container */}
+      <div className="fixed bottom-4 right-4 flex flex-col items-end space-y-3 md:space-y-4">
+        {/* Add Question Button */}
+        <button
+          onClick={handleAddNewProblem}
+          className="flex items-center gap-2 bg-indigo-600 text-white py-3 px-5 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 w-max md:w-auto"
+        >
+          <FaPlus className="text-lg" />
+          <span className="hidden sm:inline">Add Question</span>
+        </button>
+
+        {/* Add from Word Button */}
+        <button
+          onClick={handleWorldDocClick}
+          className="flex items-center gap-2 bg-green-600 text-white py-3 px-5 rounded-full shadow-lg hover:bg-green-700 transition duration-300 w-max md:w-auto"
+        >
+          <FaFileUpload className="text-lg" />
+          <span className="hidden sm:inline">
+            Upload Formatted Word Document
+          </span>
+        </button>
+      </div>
 
       {/* Conditionally render AddQuizQuestion */}
       {showQuestionList && (
-        <AddQuizQuestion
-          onClose={() => setShowQuestionList(false)}
-        />
+        <AddQuizQuestion onClose={() => setShowQuestionList(false)} />
       )}
     </div>
   );

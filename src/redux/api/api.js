@@ -375,6 +375,16 @@ const api = createApi({
       invalidatesTags: ["Quiz"],
     }),
 
+    addMultipleQuestionToQuiz: builder.mutation({
+      query: (data) => ({
+        url: `/api/quiz/questions/create-multiple`,
+        method: "POST",
+        body: data,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Quiz"],
+    }),
+
     editQuizQuestion: builder.mutation({
       query: ({ id, data }) => ({
         url: `/api/quiz/questions/${id}`,
@@ -474,6 +484,7 @@ export const {
   useEditQuizDataMutation,
   useDeleteQuizMutation,
   useAddQuestionToQuizMutation,
+  useAddMultipleQuestionToQuizMutation,
   useEditQuizQuestionMutation,
   useDeleteQuizQuestionMutation,
   useCreateQuizMutation,

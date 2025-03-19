@@ -1,7 +1,7 @@
+import axios from "axios";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import axios from "axios";
 
 // Components
 import NotProtectedLayout from "./components/auth/NotProtectedLayout";
@@ -33,17 +33,16 @@ import {
 } from "./redux/reducers/auth";
 
 // Config
-import { config, server } from "./constants/config";
 import NotFound from "./components/NotFound";
-import HomeSkeleton from "./components/Skeletons/HomeSkeleton";
+import { config, server } from "./constants/config";
 import MainQuiz from "./pages/quiz/MainQuiz";
 // import AddQuizQuetion from "./pages/quiz/AddQuizQuetion";
-import MCQAdminPage from "./pages/quiz/AddQuizQuetion";
 import QuizOverviewPage from "./components/quiz components/QuizOverviewPage";
-import BatchPage from "./pages/quiz/BatchPage";
-import AddQuizQuestion from "./pages/quiz/AddQuizQuetion";
-import StudentBatchPage from "./components/UserQuiz/StudentBatchPage";
 import BatchDetailsPage from "./components/UserQuiz/BatchDetailsPage";
+import StudentBatchPage from "./components/UserQuiz/StudentBatchPage";
+import AddQuizQuestion from "./pages/quiz/AddQuizQuetion";
+import BatchPage from "./pages/quiz/BatchPage";
+import WordQuizImporter from "./shared/WordQuizImporter";
 
 function App() {
   const { host, loading, user, challengeProgress } = useSelector(
@@ -107,6 +106,7 @@ function App() {
             <Route path="/quiz/overview" element={<QuizOverviewPage />} />
             <Route path="/quiz/batch" element={<BatchPage />} />
             <Route path="/quiz/add-question" element={<AddQuizQuestion />} />
+            <Route path="/quiz/uploadWordDoc" element={<WordQuizImporter />} />
           </Route>
 
           <Route path="/add-question" element={<AddQuestion />} />
@@ -138,6 +138,7 @@ function App() {
             <Route path="/user/quiz" element={<MainQuiz />} />
           <Route path="/editor" element={<MainCode />} />
         </Route>
+
 
         {/* Catch-all Route for NotFound Page */}
         <Route path="*" element={<NotFound />} />

@@ -36,24 +36,32 @@ export default function QuizProblemList({ questions, quizData }) {
 
   return (
     <div className="min-h-screen">
-      {/* Stats Section */}
-      <div className="flex flex-col sm:flex-row sm:justify-between items-center  text-indigo-700  mb-2 text-center sm:text-left border-b-2 border-zinc-300">
-        <h2 className="text-lg sm:text-xl font-bold mb-2 sm:mb-0">
-          Total Questions:{" "}
-          <span className="text-indigo-900">
+      {/* Stats Cards Container */}
+      <div className="grid grid-cols-2 gap-4 sm:flex sm:justify-center mb-6">
+        {/* Total Questions Card */}
+        <div className="bg-white border-l-4 border-indigo-500 shadow-md rounded-lg p-4 text-center sm:w-48">
+          <h2 className="text-lg font-semibold text-gray-700">
+            Total Questions
+          </h2>
+          <p className="text-2xl font-bold text-indigo-900">
             {quizData?.questions?.length || 0}
-          </span>
-        </h2>
-        <h2 className="text-lg sm:text-xl font-bold">
-          Total Marks:{" "}
-          <span className="text-indigo-900">{quizData?.totalMarks || 0}</span>
-        </h2>
+          </p>
+        </div>
+
+        {/* Total Marks Card */}
+        <div className="bg-white border-l-4 border-green-500 shadow-md rounded-lg p-4 text-center sm:w-48">
+          <h2 className="text-lg font-semibold text-gray-700">Total Marks</h2>
+          <p className="text-2xl font-bold text-green-900">
+            {quizData?.totalMarks || 0}
+          </p>
+        </div>
       </div>
 
       {/* Title */}
-      <h2 className="text-2xl font-bold mb-4 text-indigo-700">
+      <h2 className="text-2xl font-bold text-indigo-700 text-center mt-6 mb-4">
         Added Questions
       </h2>
+
       {/* Grid layout with uniform height cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {questions.map((question, index) => (
