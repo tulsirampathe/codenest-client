@@ -271,9 +271,6 @@ function StudentBatchPage() {
   const [enrolledBatches] = useState(user?.batches);
   const [pendingRequests, setPendingRequests] = useState(user?.pendingRequests);
 
-  console.log(user);
-  
-
   if (!enrolledBatches || !pendingRequests) {
     <LoadingSpinner />;
   }
