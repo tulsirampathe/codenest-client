@@ -7,10 +7,7 @@ import {
   FiChevronRight,
   FiClock,
 } from "react-icons/fi";
-import {
-  MdCheckCircle,
-  MdHome
-} from "react-icons/md";
+import { MdCheckCircle, MdHome } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../components/LoadingSpinner";
@@ -28,13 +25,37 @@ function MainQuiz() {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [timeSpent, setTimeSpent] = useState({});
   const [shuffledOptions, setShuffledOptions] = useState([]);
+  const [showFullscreenPrompt, setShowFullscreenPrompt] = useState(true);
   const intervalRef = useRef(null);
+  const quizRef = useRef(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const { user, quizID } = useSelector((state) => state.auth);
 
+  // Add fullscreen exit handler
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && !quizSubmitted) {
+        handleQuizSubmit();
+      }
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, [quizSubmitted]);
+
+  // Add cleanup effect
+  useEffect(() => {
+    return () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    };
+  }, []);
+
+  // Check if quizID is missing and redirect if necessary
   useEffect(() => {
     if (!quizID && !quizSubmitted) {
       navigate("/user/quiz/dashboard");
@@ -49,22 +70,17 @@ function MainQuiz() {
 
   const [submitQuizQuestion] = useSubmitQuizQuestionMutation();
 
-  // 🟢 First, initialize `timeRemaining` from quiz start & end time
+  // Initialize `timeRemaining` from quiz start & end time
   useEffect(() => {
     if (quizData?.startTime && quizData?.endTime) {
       const startTime = moment.utc(quizData.startTime);
       const endTime = moment.utc(quizData.endTime);
       let durationSeconds = endTime.diff(startTime, "seconds"); // Convert to seconds
-
-      // Ensure timeRemaining is never negative
       setTimeRemaining(durationSeconds > 0 ? durationSeconds : 0);
     }
-  }, [
-    quizData?.startTime,
-    quizData?.endTime
-  ]);
+  }, [quizData?.startTime, quizData?.endTime]);
 
-  // 🟢 Then, adjust `timeRemaining` based on user's previous progress
+  // Adjust `timeRemaining` based on user's previous progress
   useEffect(() => {
     if (userQuizAnswers?.submission?.answers) {
       setSelectedAnswers(userQuizAnswers.submission.answers);
@@ -78,6 +94,7 @@ function MainQuiz() {
     }
   }, [userQuizAnswers]);
 
+  // Timer for quiz countdown
   useEffect(() => {
     if (!quizSubmitted && timeRemaining > 0 && quizData) {
       const timer = setInterval(() => {
@@ -87,9 +104,9 @@ function MainQuiz() {
     }
   }, [quizSubmitted, timeRemaining, quizData]);
 
+  // Timer for time spent on current question
   useEffect(() => {
     if (!quizData) return;
-
     const questionId = quizData.questions[currentQuestionIndex]._id;
     intervalRef.current = setInterval(() => {
       setTimeSpent((prev) => ({
@@ -97,7 +114,6 @@ function MainQuiz() {
         [questionId]: (prev[questionId] || 0) + 1,
       }));
     }, 1000);
-
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
@@ -105,15 +121,15 @@ function MainQuiz() {
 
   const currentQuestion = quizData?.questions[currentQuestionIndex];
 
+  // Shuffle options when current question changes
   useEffect(() => {
     if (currentQuestion?.options) {
-      // Create an array of indexes to shuffle
       const indexedOptions = currentQuestion.options.map((option, index) => ({
         option,
         originalIndex: index, // Store original index for correct answer mapping
       }));
 
-      // Shuffle options array using Fisher-Yates algorithm
+      // Fisher-Yates shuffle
       for (let i = indexedOptions.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [indexedOptions[i], indexedOptions[j]] = [
@@ -121,14 +137,12 @@ function MainQuiz() {
           indexedOptions[i],
         ];
       }
-
       setShuffledOptions(indexedOptions);
     }
-  }, [currentQuestion]); // Shuffle only when the question changes
+  }, [currentQuestion]);
 
   const handleAnswerSelect = (questionId, optionIndex) => {
-    const timeTaken = timeSpent[questionId] || 0; // Get time spent on the question
-
+    const timeTaken = timeSpent[questionId] || 0;
     submitQuizQuestion({
       quizId: quizID,
       questionId: questionId,
@@ -152,8 +166,20 @@ function MainQuiz() {
     if (hours > 0) result.push(`${hours}h`);
     if (minutes > 0) result.push(`${minutes}m`);
     result.push(`${secs}s`);
-
     return result.join(" ");
+  };
+
+  // Add fullscreen handler
+  const handleStartFullscreen = async () => {
+    try {
+      if (quizRef.current) {
+        await quizRef.current.requestFullscreen();
+        setShowFullscreenPrompt(false);
+      }
+    } catch (err) {
+      console.error("Fullscreen failed:", err);
+      alert("Fullscreen is required to continue with the quiz!");
+    }
   };
 
   if (isQuizLoading || !quizData || isQuizAnswersLoading) {
@@ -164,15 +190,11 @@ function MainQuiz() {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-6">
         <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full text-center shadow-lg">
-          {/* Success Icon */}
           <MdCheckCircle className="text-5xl text-green-400 mx-auto mb-4" />
-
           <h1 className="text-2xl font-semibold mb-4">Quiz Completed</h1>
           <p className="text-gray-400 text-sm mb-6">
             You have successfully completed the quiz. Here are your results:
           </p>
-
-          {/* Score Summary */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-gray-700 p-4 rounded-md">
               <p className="text-xl font-semibold text-blue-400">
@@ -188,8 +210,6 @@ function MainQuiz() {
               <p className="text-gray-400 text-xs mt-1">Questions Answered</p>
             </div>
           </div>
-
-          {/* Back to Home Button */}
           <button
             onClick={() => navigate("/user/quiz/dashboard")}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium flex items-center justify-center gap-2 mx-auto transition"
@@ -202,7 +222,34 @@ function MainQuiz() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8">
+    <div
+      ref={quizRef}
+      className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8"
+    >
+     {showFullscreenPrompt && (
+  <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-80">
+    <div className="bg-gray-800 p-8 rounded-lg text-center max-w-96 w-full mx-4">
+      <h1 className="text-2xl font-bold mb-4 text-white">
+        Fullscreen Required
+      </h1>
+      <p className="text-gray-400 mb-6">
+        For a secure and distraction-free experience, please enter fullscreen mode. Exiting fullscreen will automatically submit your quiz.
+      </p>
+      <button
+        onClick={handleStartFullscreen}
+        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 mx-auto"
+      >
+        <FiChevronRight className="text-xl" /> Enter Fullscreen
+      </button>
+      <p className="text-sm text-gray-500 mt-6">
+        Note: Exiting fullscreen during the quiz will submit your answers automatically.
+      </p>
+    </div>
+  </div>
+)}
+
+
+      {/* Main Quiz Content Here */}
       <div className="max-w-6xl mx-auto">
         {/* Quiz Header */}
         <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
@@ -238,11 +285,10 @@ function MainQuiz() {
           />
         </div>
 
-        {/* Main Quiz Content */}
+        {/* Main Quiz Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Question Content */}
           <div className="lg:col-span-2 bg-gray-800 p-8 rounded-2xl shadow-xl">
-            {/* Question Header */}
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-3 text-purple-400">
                 <BiTime className="text-xl" />
@@ -251,13 +297,9 @@ function MainQuiz() {
                 </span>
               </div>
             </div>
-
-            {/* Question Statement */}
             <h2 className="text-2xl font-semibold mb-2 leading-relaxed">
               {currentQuestion.text}
             </h2>
-
-            {/* Options */}
             <div className="space-y-2 mb-12">
               {shuffledOptions.map(({ option, originalIndex }) => {
                 const isSelected =
@@ -265,9 +307,8 @@ function MainQuiz() {
                   selectedAnswers.some(
                     (ans) =>
                       ans.question._id === currentQuestion._id &&
-                      ans.selectedOption === originalIndex // Use original index
+                      ans.selectedOption === originalIndex
                   );
-
                 return (
                   <button
                     key={originalIndex}
@@ -292,8 +333,6 @@ function MainQuiz() {
                 );
               })}
             </div>
-
-            {/* Navigation Controls */}
             <div className="flex justify-between items-center">
               <button
                 onClick={() =>
@@ -304,7 +343,6 @@ function MainQuiz() {
               >
                 <FiChevronLeft /> Previous
               </button>
-
               {currentQuestionIndex === quizData.questions.length - 1 ? (
                 <button
                   onClick={handleQuizSubmit}

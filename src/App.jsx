@@ -89,8 +89,8 @@ function App() {
 
   // Show Loading Spinner
   if (loading.host || loading.user) {
-    // return <LoadingSpinner />;
-    return <HomeSkeleton />;
+    return <LoadingSpinner />;
+    // return <HomeSkeleton />;
   }
 
   return (

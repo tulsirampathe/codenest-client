@@ -55,10 +55,10 @@ const BatchDetailItem = ({ icon: Icon, label, value }) => (
 const QuizList = ({ title, status, color, quizzes }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [showAll, setShowAll] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [quizInitialize] = useQuizInitializeMutation();
 
   const onAccept = async () => {
@@ -79,72 +79,93 @@ const QuizList = ({ title, status, color, quizzes }) => {
       </div>
       <div className="space-y-4 p-4">
         {quizzes.length ? (
-          quizzes.map((quiz) => (
-            <div
-              key={quiz._id}
-              className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
-            >
-              <h3 className="font-semibold text-gray-800">{quiz.name}</h3>
-              <div className="mt-1 flex flex-col items-center text-center">
-                <p
-                  className={`px-2 py-1 text-xs bg-${color}-100 text-${color}-800 rounded-full`}
-                >
-                  {quiz.status}
-                </p>
-                {status === "ongoing" ? (
-                  <>
+          <>
+            {quizzes.slice(0, showAll ? quizzes.length : 2).map((quiz) => (
+              <div
+                key={quiz._id}
+                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+              >
+                <h3 className="font-semibold text-gray-800">{quiz.name}</h3>
+                <div className="mt-1 flex flex-col items-center text-center">
+                  <p
+                    className={`px-2 py-1 text-xs bg-${color}-100 text-${color}-800 rounded-full`}
+                  >
+                    {quiz.status}
+                  </p>
+                  {status === "ongoing" ? (
+                    <>
+                      <p className="text-sm text-gray-500 mt-2">
+                        Ends at{" "}
+                        {moment(quiz.endTime).format("DD/MM/YYYY h:mm A")}
+                      </p>
+                      <div className="relative group mt-2">
+                        <button
+                          onClick={() => handleAttemptClick(quiz._id)}
+                          className="text-sm font-semibold text-white bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                        >
+                          Attempt Quiz
+                        </button>
+                        <div className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-3 py-1 whitespace-nowrap">
+                          Only 1 attempt allowed
+                        </div>
+                      </div>
+                    </>
+                  ) : status === "upcoming" ? (
                     <p className="text-sm text-gray-500 mt-2">
-                      Ends at {moment(quiz.endTime).format("DD/MM/YYYY h:mm A")}
+                      Starts in{" "}
+                      {moment(quiz.startTime).format("DD/MM/YYYY h:mm A")}
                     </p>
-                    <div className="relative group mt-2">
-                      <button
-                        onClick={() => handleAttemptClick(quiz._id)}
-                        className="text-sm font-semibold text-white bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition"
-                      >
-                        Attempt Quiz
-                      </button>
-                      {/* Tooltip on hover */}
-                      <div className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-3 py-1 whitespace-nowrap">
-                        Only 1 attempt allowed
+                  ) : (
+                    <div className="flex flex-col gap-1 text-sm text-gray-700">
+                      {/* Score Section */}
+                      <div className="flex items-center gap-2">
+                        <p className="text-gray-600 text-xs sm:text-sm">
+                          Score:
+                        </p>
+                        <span className="font-bold text-purple-600 text-base">
+                          {quiz.totalScore || 0}/{quiz.totalMarks || 100}
+                        </span>
+                      </div>
+
+                      {/* Date Section */}
+                      <div className="flex items-center gap-2">
+                        <CalendarIcon className="w-4 h-4 text-gray-500" />
+                        <p className="text-gray-500 text-xs sm:text-sm">
+                          {moment(quiz.startTime).format("MMM D, YYYY")}
+                        </p>
                       </div>
                     </div>
-                  </>
-                ) : status === "upcoming" ? (
-                  <p className="text-sm text-gray-500 mt-2">
-                    Starts in{" "}
-                    {moment(quiz.startTime).format("DD/MM/YYYY h:mm A")}
-                  </p>
-                ) : (
-                  <div className="flex flex-col gap-1 text-sm text-gray-700">
-                    {/* Score Section */}
-                    <div className="flex items-center gap-2">
-                      <p className="text-gray-600 text-xs sm:text-sm">Score:</p>
-                      <span className="font-bold text-purple-600 text-base">
-                        {quiz.totalScore}/{quiz.totalMarks || 100}
-                      </span>
-                    </div>
+                  )}
+                </div>
 
-                    {/* Date Section */}
-                    <div className="flex items-center gap-2">
-                      <CalendarIcon className="w-4 h-4 text-gray-500" />
-                      <p className="text-gray-500 text-xs sm:text-sm">
-                        {moment(quiz.startTime).format("MMM D, YYYY")}
-                      </p>
-                    </div>
-                  </div>
-                )}
+                {/* Popup Modal */}
+                <PopupModal
+                  isOpen={isModalOpen}
+                  onClose={() => setIsModalOpen(false)}
+                  title="Quiz Instructions"
+                  acceptText="Start Quiz"
+                  onAccept={onAccept}
+                />
               </div>
+            ))}
 
-              {/* Popup Modal */}
-              <PopupModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title="Quiz Instructions"
-                acceptText="Start Quiz"
-                onAccept={onAccept}
-              />
-            </div>
-          ))
+            {/* See More / See Less Button */}
+            {quizzes.length > 2 && (
+              <button
+                className="mt-4 flex items-center justify-center gap-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg text-sm font-semibold transition-all duration-300 hover:bg-blue-200"
+                onClick={() => setShowAll(!showAll)}
+              >
+                {showAll ? "See Less" : "See More"}
+                <span
+                  className={`transform transition-transform duration-300 ${
+                    showAll ? "rotate-180" : "rotate-0"
+                  }`}
+                >
+                  ⬇️
+                </span>
+              </button>
+            )}
+          </>
         ) : (
           <p className="text-gray-500 text-sm text-center py-4">
             No {title.toLowerCase()}
