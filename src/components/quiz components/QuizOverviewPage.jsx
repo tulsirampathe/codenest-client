@@ -127,7 +127,7 @@ function QuizOverviewPage() {
 
       {/* Right Side: Problem List */}
       <div className="w-full md:w-2/3 p-4">
-        <QuizProblemList questions={quizData?.questions} />
+        <QuizProblemList questions={quizData?.questions} quizData={quizData} />
       </div>
 
       {/* Modal for Delete Confirmation */}

@@ -6,7 +6,7 @@ import ConfirmationDeleteModal from "../../shared/ConfirmationDeleteModal";
 import { useDeleteQuizQuestionMutation } from "../../redux/api/api";
 import useMutationToast from "../../hooks/useMutationToast";
 
-export default function QuizProblemList({ questions }) {
+export default function QuizProblemList({ questions, quizData }) {
   const [showForm, setShowForm] = useState(false);
   const [editData, setEditData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,10 +36,24 @@ export default function QuizProblemList({ questions }) {
 
   return (
     <div className="min-h-screen">
+      {/* Stats Section */}
+      <div className="flex flex-col sm:flex-row sm:justify-between items-center  text-indigo-700  mb-2 text-center sm:text-left border-b-2 border-zinc-300">
+        <h2 className="text-lg sm:text-xl font-bold mb-2 sm:mb-0">
+          Total Questions:{" "}
+          <span className="text-indigo-900">
+            {quizData?.questions?.length || 0}
+          </span>
+        </h2>
+        <h2 className="text-lg sm:text-xl font-bold">
+          Total Marks:{" "}
+          <span className="text-indigo-900">{quizData?.totalMarks || 0}</span>
+        </h2>
+      </div>
+
+      {/* Title */}
       <h2 className="text-2xl font-bold mb-4 text-indigo-700">
         Added Questions
       </h2>
-
       {/* Grid layout with uniform height cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {questions.map((question, index) => (
