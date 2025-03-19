@@ -22,39 +22,6 @@ const sections = [
   { name: "Pending Requests", icon: <FaClock size={20} /> },
 ];
 
-// Dummy data
-const dummyBatches = [
-  {
-    _id: "1",
-    name: "Web Development Fundamentals",
-    description: "Learn the basics of HTML, CSS, and JavaScript",
-    code: "WEB123",
-    startDate: moment().subtract(3, "days").format("YYYY-MM-DD"),
-  },
-  {
-    _id: "2",
-    name: "App Development Fundamentals",
-    description: "Learn the basics of mobile app development",
-    code: "APP456",
-    startDate: moment().subtract(1, "week").format("YYYY-MM-DD"),
-  },
-  {
-    _id: "3",
-    name: "Mobile Development Fundamentals",
-    description: "Learn to build mobile applications",
-    code: "MOB789",
-    startDate: moment().subtract(5, "days").format("YYYY-MM-DD"),
-  },
-];
-
-const dummyPendingRequests = [
-  {
-    _id: "req1",
-    batchName: "React Masterclass",
-    status: "pending",
-  },
-];
-
 const JoinBatchModal = ({ onClose, setPendingRequests }) => {
   const [code, setCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -303,6 +270,9 @@ function StudentBatchPage() {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [enrolledBatches] = useState(user?.batches);
   const [pendingRequests, setPendingRequests] = useState(user?.pendingRequests);
+
+  console.log(user);
+  
 
   if (!enrolledBatches || !pendingRequests) {
     <LoadingSpinner />;
