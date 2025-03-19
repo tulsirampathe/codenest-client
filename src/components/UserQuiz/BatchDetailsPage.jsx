@@ -11,6 +11,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import PopupModal from "../../shared/PopupModal";
 import { setQuizID } from "../../redux/reducers/auth";
 import { useNavigate } from "react-router-dom";
+import { CalendarIcon } from "lucide-react";
 
 // Dummy notifications
 const notifications = [
@@ -84,7 +85,7 @@ const QuizList = ({ title, status, color, quizzes }) => {
               className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
             >
               <h3 className="font-semibold text-gray-800">{quiz.name}</h3>
-              <div className="mt-3 flex flex-col items-center text-center">
+              <div className="mt-1 flex flex-col items-center text-center">
                 <p
                   className={`px-2 py-1 text-xs bg-${color}-100 text-${color}-800 rounded-full`}
                 >
@@ -114,9 +115,23 @@ const QuizList = ({ title, status, color, quizzes }) => {
                     {moment(quiz.startTime).format("DD/MM/YYYY h:mm A")}
                   </p>
                 ) : (
-                  <p className="text-gray-500 text-xs mt-2">
-                    Completed on {moment(quiz.startTime).format("MMM D, YYYY")}
-                  </p>
+                  <div className="flex flex-col gap-1 text-sm text-gray-700">
+                    {/* Score Section */}
+                    <div className="flex items-center gap-2">
+                      <p className="text-gray-600 text-xs sm:text-sm">Score:</p>
+                      <span className="font-bold text-purple-600 text-base">
+                        {quiz.totalScore}/{quiz.totalMarks || 100}
+                      </span>
+                    </div>
+
+                    {/* Date Section */}
+                    <div className="flex items-center gap-2">
+                      <CalendarIcon className="w-4 h-4 text-gray-500" />
+                      <p className="text-gray-500 text-xs sm:text-sm">
+                        {moment(quiz.startTime).format("MMM D, YYYY")}
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -166,7 +181,10 @@ const NotificationItem = ({ notification }) => (
 
 const BatchDetailsPage = () => {
   const { batchID, user } = useSelector((state) => state.auth);
-  const { data, isLoading } = useBatchDataQuery({batchId: batchID, userId: user._id});
+  const { data, isLoading } = useBatchDataQuery({
+    batchId: batchID,
+    userId: user._id,
+  });
 
   if (isLoading || !data?.batch) return <LoadingSpinner />;
 
@@ -179,9 +197,11 @@ const BatchDetailsPage = () => {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-8">
           {/* Batch Details Section */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">{name}</h1>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4">
+              {name}
+            </h1>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <BatchDetailItem icon={FaCode} label="Code" value={batchCode} />
               <BatchDetailItem
                 icon={FaCalendar}
@@ -194,11 +214,13 @@ const BatchDetailsPage = () => {
                 value={students?.length}
               />
             </div>
-            <div className="mt-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            <div className="mt-4 sm:mt-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
                 Description
               </h2>
-              <p className="text-gray-600">{description}</p>
+              <p className="text-gray-600 text-sm sm:text-base">
+                {description}
+              </p>
             </div>
           </div>
 
@@ -223,7 +245,7 @@ const BatchDetailsPage = () => {
               <QuizList
                 title="Completed Quizzes"
                 status="completed"
-                color="purple"
+                color="red"
                 quizzes={quizzes.filter((q) => q.status === "completed")}
               />
             </div>

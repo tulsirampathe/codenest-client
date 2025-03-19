@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
 import { BiCodeBlock, BiTime } from "react-icons/bi";
 import {
   FiCheck,
@@ -8,20 +9,16 @@ import {
 } from "react-icons/fi";
 import {
   MdCheckCircle,
-  MdHome,
-  MdOutlineEmojiEvents,
-  MdRestartAlt,
-  MdTimer,
+  MdHome
 } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import {
   useGetUserQuizSubmissionQuery,
   useQuizDataQuery,
   useSubmitQuizQuestionMutation,
 } from "../../redux/api/api";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import moment from "moment";
-import { useNavigate } from "react-router-dom";
 import { setQuizID } from "../../redux/reducers/auth";
 
 function MainQuiz() {
@@ -47,18 +44,32 @@ function MainQuiz() {
   const { data, isLoading: isQuizLoading } = useQuizDataQuery(quizID);
   const quizData = data?.quiz;
 
-
-
   const { data: userQuizAnswers, isLoading: isQuizAnswersLoading } =
     useGetUserQuizSubmissionQuery({ userId: user?._id, quizId: quizID });
 
   const [submitQuizQuestion] = useSubmitQuizQuestionMutation();
 
+  // 🟢 First, initialize `timeRemaining` from quiz start & end time
+  useEffect(() => {
+    if (quizData?.startTime && quizData?.endTime) {
+      const startTime = moment.utc(quizData.startTime);
+      const endTime = moment.utc(quizData.endTime);
+      let durationSeconds = endTime.diff(startTime, "seconds"); // Convert to seconds
+
+      // Ensure timeRemaining is never negative
+      setTimeRemaining(durationSeconds > 0 ? durationSeconds : 0);
+    }
+  }, [
+    quizData?.startTime,
+    quizData?.endTime
+  ]);
+
+  // 🟢 Then, adjust `timeRemaining` based on user's previous progress
   useEffect(() => {
     if (userQuizAnswers?.submission?.answers) {
       setSelectedAnswers(userQuizAnswers.submission.answers);
 
-      // Update timeSpent with the time taken from server
+      // Update timeSpent with the time taken from the server
       const newTimeSpent = {};
       userQuizAnswers.submission.answers.forEach((answer) => {
         newTimeSpent[answer.question._id] = answer.timeTaken / 1000; // Convert ms to sec
@@ -66,15 +77,6 @@ function MainQuiz() {
       setTimeSpent(newTimeSpent);
     }
   }, [userQuizAnswers]);
-
-  useEffect(() => {
-    if (quizData?.startTime && quizData?.endTime) {
-      const startTime = moment.utc(quizData.startTime);
-      const endTime = moment.utc(quizData.endTime);
-      const durationSeconds = endTime.diff(startTime, "seconds"); // Convert to seconds
-      setTimeRemaining(durationSeconds);
-    }
-  }, [quizData?.startTime, quizData?.endTime]);
 
   useEffect(() => {
     if (!quizSubmitted && timeRemaining > 0 && quizData) {

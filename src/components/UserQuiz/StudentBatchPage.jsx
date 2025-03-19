@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setBatchID } from "../../redux/reducers/auth";
 import { useJoinBatchReqMutation } from "../../redux/api/api";
 import useMutationToast from "../../hooks/useMutationToast";
+import LoadingSpinner from "../LoadingSpinner";
 
 const sections = [
   { name: "Batches", icon: <FaUserGraduate size={20} /> },
@@ -194,9 +195,12 @@ const YourBatches = ({ batches, onOpenJoin }) => {
   };
 
   // Correct filtering logic
-  const filteredBatches = batches.filter((batch) =>
-    batch?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredBatches =
+    searchQuery.trim() === ""
+      ? batches
+      : batches.filter((batch) =>
+          batch?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
 
   const formatDisplayDateTime = (date) => {
     return moment(date).format("D MMMM YYYY");
@@ -236,15 +240,13 @@ const YourBatches = ({ batches, onOpenJoin }) => {
       {filteredBatches.length === 0 ? (
         <div className="text-center py-12">
           <div className="max-w-xs mx-auto mb-4">
+            {/* Add your 3D illustration here */}
             <div className="bg-indigo-600 w-full h-48 rounded-xl mb-4 flex items-center justify-center">
-              <span className="text-2xl text-gray-900 font-bold animate-bounce">
-              No batches available!
+              <span className="text-gray-900 text-2xl font-bold animate-bounce">
+                No batches available!
               </span>
             </div>
           </div>
-          <p className="text-gray-600">
-            No batches match your search "{searchQuery}"
-          </p>
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
@@ -263,7 +265,7 @@ const YourBatches = ({ batches, onOpenJoin }) => {
                     {batch.description}
                   </p>
 
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div className="flex items-center text-gray-500">
                       <span className="font-medium mr-2">Start Date:</span>
                       {formatDisplayDateTime(batch.startDate)}
@@ -301,6 +303,10 @@ function StudentBatchPage() {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [enrolledBatches] = useState(user?.batches);
   const [pendingRequests, setPendingRequests] = useState(user?.pendingRequests);
+
+  if (!enrolledBatches || !pendingRequests) {
+    <LoadingSpinner />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-8">
