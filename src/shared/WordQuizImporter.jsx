@@ -44,45 +44,84 @@ const WordQuizImporter = () => {
         marks: 0,
       };
 
+      let hasQuestion = false;
+      let optionCount = 0;
       const rows = table.querySelectorAll("tr");
-      rows.forEach((row) => {
-        const cells = row.querySelectorAll("td");
-        if (cells.length >= 3) {
-          const type = cells[0].textContent.trim();
-          const content = cells[1].textContent.trim();
-          const correctness = cells[2]?.textContent.trim().toLowerCase();
 
-          switch (type) {
-            case "Question":
-              question.text = content;
-              break;
-            case "Option A":
-            case "Option B":
-            case "Option C":
-            case "Option D":
-              const index = type.charCodeAt(7) - 65; // Get A(0)-D(3)
-              question.options[index] = content;
-              if (correctness === "correct") {
-                question.correctAnswerIndex = index;
+      rows.forEach((row) => {
+        const cells = Array.from(row.querySelectorAll("td"));
+        if (cells.length < 1) return;
+
+        const typeCell = cells[0];
+        const type = typeCell.textContent.trim().toLowerCase();
+
+        // Handle colspan in cells
+        const getContentCell = () => {
+          if (cells.length >= 2) return cells[1];
+          // Handle colspan cases
+          const contentCell = typeCell.nextElementSibling;
+          return contentCell || null;
+        };
+
+        switch (type) {
+          case "question": {
+            const contentCell = getContentCell();
+            if (contentCell) {
+              question.text = contentCell.textContent.trim();
+              hasQuestion = true;
+            }
+            break;
+          }
+
+          case "option": {
+            if (cells.length >= 3) {
+              const optionText = cells[1]?.textContent.trim() || "";
+              const isCorrect =
+                cells[2]?.textContent.trim().toLowerCase() === "correct";
+
+              if (optionText) {
+                question.options.push(optionText);
+                if (isCorrect) {
+                  question.correctAnswerIndex = question.options.length - 1;
+                }
+                optionCount++;
               }
-              break;
-            case "Solution":
-              question.explanation = content;
-              break;
-            case "Marks":
-              question.marks = parseInt(content) || 0;
-              break;
+            }
+            break;
+          }
+
+          case "solution": {
+            const contentCell = getContentCell();
+            if (contentCell) {
+              question.explanation = contentCell.textContent.trim();
+            }
+            break;
+          }
+
+          case "marks": {
+            const contentCell = getContentCell();
+            if (contentCell) {
+              const marksValue = parseFloat(contentCell.textContent.trim());
+              question.marks = !isNaN(marksValue) ? Math.max(0, marksValue) : 0;
+            }
+            break;
           }
         }
       });
 
-      // Validate the question
-      if (
-        question.text &&
-        question.options.length === 4 &&
-        question.correctAnswerIndex !== -1
-      ) {
+      // Validation with detailed error reporting
+      const errors = [];
+      if (!hasQuestion) errors.push("Missing question text");
+      if (question.options.length !== 4)
+        errors.push(`Found ${question.options.length} options (need 4)`);
+      if (question.correctAnswerIndex === -1)
+        errors.push("No correct answer marked");
+      if (question.marks <= 0) errors.push("Invalid or missing marks");
+
+      if (errors.length === 0) {
         questions.push(question);
+      } else {
+        console.warn(`Skipped invalid question: ${errors.join(", ")}`);
       }
     });
 
@@ -91,26 +130,48 @@ const WordQuizImporter = () => {
 
   const handleFileUpload = async (file) => {
     try {
-      // Reset previous state
       setParsedQuestions([]);
       setError("");
 
-      const result = await mammoth.convertToHtml({ arrayBuffer: file });
-      const questions = parseHtmlContent(result.value);
-
-      if (questions.length === 0) {
-        setError("No valid questions found. Please check the table format.");
+      if (!file) {
+        setError("No file selected");
         return;
       }
 
-      setParsedQuestions(questions);
-    } catch (err) {
-      setError("Error parsing Word document. Please check the file format.");
-    } finally {
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+      const result = await mammoth.convertToHtml({ arrayBuffer: file });
+      const conversionIssues = result.messages
+        .filter((m) => m.type === "warning")
+        .map((m) => m.message);
+
+      const questions = parseHtmlContent(result.value);
+
+      let errorMessages = [];
+      // if (conversionIssues.length > 0) {
+      //   errorMessages.push("Document conversion notes:", ...conversionIssues);
+      // }
+
+      if (questions.length === 0) {
+        errorMessages.push(
+          "No valid questions found. Please check:",
+          "- Each table contains a complete question",
+          "- Exactly 4 options per question",
+          "- One correct answer marked with 'correct'",
+          "- Valid marks value in last row"
+        );
       }
+
+      if (errorMessages.length > 0) {
+        setError(errorMessages.join("\n• "));
+      }
+
+      if (questions.length > 0) {
+        setParsedQuestions(questions);
+      }
+    } catch (err) {
+      console.error("Document processing failed:", err);
+      setError(`Failed to process document: ${err.message}`);
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -146,10 +207,12 @@ const WordQuizImporter = () => {
     setParsedQuestions(updatedQuestions);
   };
 
+  // Update marks handling to support decimals
   const handleMarksChange = (qIndex, value) => {
     const updatedQuestions = parsedQuestions.map((q, index) => {
       if (index === qIndex) {
-        return { ...q, marks: Math.max(0, parseInt(value) || 0) };
+        const numericValue = parseFloat(value) || 0;
+        return { ...q, marks: Math.max(0, numericValue) };
       }
       return q;
     });
@@ -173,6 +236,7 @@ const WordQuizImporter = () => {
         q.options.length === 4 &&
         q.options.every((opt) => opt.trim()) &&
         q.correctAnswerIndex >= 0 &&
+        q.correctAnswerIndex < 4 &&
         q.marks > 0
     );
   };
@@ -215,13 +279,6 @@ const WordQuizImporter = () => {
           <div className="mt-4 text-sm text-gray-500">
             <p>Required table format:</p>
             <table className="mt-2 border-collapse w-full">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="border p-2">Question Type</th>
-                  <th className="border p-2">Content</th>
-                  <th className="border p-2">Correctness</th>
-                </tr>
-              </thead>
               <tbody>
                 <tr>
                   <td className="border p-2">Question</td>
@@ -244,8 +301,8 @@ const WordQuizImporter = () => {
                 </tr>
                 <tr>
                   <td className="border p-2">Marks</td>
-                  <td className="border p-2">Number</td>
-                  <td className="border p-2"></td>
+                  <td className="border p-2">Total Marks</td>
+                  <td className="border p-2">Negitive Marks</td>
                 </tr>
               </tbody>
             </table>
@@ -253,8 +310,8 @@ const WordQuizImporter = () => {
             {/* Download button for Word format */}
             <div className="mt-4">
               <a
-                href="/Quiz_Quesion_Template.docx"
-                download="Quiz_Quesion_Template.docx"
+                href="/Test format.docx"
+                download="Test format.docx"
                 className="px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700"
               >
                 Download Word Format
@@ -318,7 +375,7 @@ const WordQuizImporter = () => {
                         } border flex items-center`}
                       >
                         <span className="font-medium mr-2 w-6">
-                          {String.fromCharCode(65 + optIndex)})
+                          {String.fromCharCode(65 + optIndex)}
                         </span>
                         <input
                           type="text"

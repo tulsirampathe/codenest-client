@@ -1,15 +1,18 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
-import { FaSyncAlt, FaTrophy, FaFilePdf } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { utils, write } from "xlsx";
+// Update FaFileWord import
+import { FaFileExcel, FaFilePdf, FaSyncAlt, FaTrophy } from "react-icons/fa";
+import useMutationToast from "../../hooks/useMutationToast";
 import {
   useCalculateLeaderboardMutation,
   useGetLeaderboardQuery,
   useGetQuizLeaderboardQuery,
 } from "../../redux/api/api";
-import useMutationToast from "../../hooks/useMutationToast";
 
 const LeaderboardPanel = ({ type }) => {
   const { challengeID, quizID } = useSelector((state) => state.auth);
@@ -27,7 +30,6 @@ const LeaderboardPanel = ({ type }) => {
     isLoading: isQuizLeaderboardLoading,
     refetch: refetchQuizLeaderboard,
   } = useGetQuizLeaderboardQuery(quizID, { skip: type !== "quiz" });
-  
 
   // Update leaderboard state when data is fetched
   useEffect(() => {
@@ -129,6 +131,88 @@ const LeaderboardPanel = ({ type }) => {
     doc.save(`${title.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`); // Replace special chars
   };
 
+
+  // ✅ Export leaderboard to Excel with formatting
+  const exportToExcel = () => {
+    if (!leaderboardParticipants.length) {
+      alert("No leaderboard data to export!");
+      return;
+    }
+  
+    // Get title and description
+    const title =
+      type === "challenge"
+        ? challengeLeaderboardData?.leaderboard?.challenge?.title ||
+          "Challenge Leaderboard"
+        : quizLeaderboardData?.leaderboard[0]?.quiz?.name || "Quiz Leaderboard";
+  
+    const description =
+      type === "challenge"
+        ? challengeLeaderboardData?.leaderboard?.challenge?.description ||
+          "No description available."
+        : quizLeaderboardData?.leaderboard[0]?.quiz?.description ||
+          "No description available.";
+  
+    // Create workbook
+    const workbook = utils.book_new();
+    const worksheetData = [
+      ["Leaderboard", "", ""],
+      [title, "", ""],
+      [description, "", ""],
+      [], // Empty row
+      ["Rank", "Name", "Points"],
+      ...leaderboardParticipants.map((p, idx) => [
+        idx + 1,
+        p.user?.username || "Unknown",
+        p.totalScore || 0
+      ])
+    ];
+  
+    const worksheet = utils.aoa_to_sheet(worksheetData);
+  
+    // Set column widths
+    worksheet["!cols"] = [{ wch: 10 }, { wch: 25 }, { wch: 15 }];
+  
+    // Merge title cells
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 2 } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: 2 } }
+    ];
+  
+    // Apply border to all cells
+    const applyBorder = (cell) => {
+      if (!cell) return;
+      cell.s = {
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" }
+        }
+      };
+    };
+  
+    Object.keys(worksheet).forEach((cellAddress) => {
+      if (cellAddress[0] !== "!") {
+        applyBorder(worksheet[cellAddress]);
+      }
+    });
+  
+    // Add worksheet to workbook
+    utils.book_append_sheet(workbook, worksheet, "Leaderboard");
+  
+    // Generate XLSX file
+    const excelBuffer = write(workbook, { bookType: "xlsx", type: "array" });
+  
+    // Create and save Blob
+    const blob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
+    saveAs(blob, `${title.replace(/[^a-zA-Z0-9]/g, "_")}.xlsx`);
+  };
+  
+  
   return (
     <section className="w-full p-6 bg-gray-50 rounded-lg shadow-xl">
       {/* Header Section with Actions */}
@@ -153,6 +237,14 @@ const LeaderboardPanel = ({ type }) => {
             <span>Refresh</span>
           </button>
 
+          {/* Excel Export Button */}
+          <button
+            onClick={exportToExcel}
+            className="bg-green-600 text-white px-4 py-2 w-full sm:w-auto rounded-lg shadow-md hover:bg-green-700 transition transform hover:scale-105 focus:outline-none flex items-center gap-2 justify-center"
+          >
+            <FaFileExcel className="w-5 h-5" />
+            <span>Excel</span>
+          </button>
           {/* Export to PDF */}
           <button
             onClick={exportToPDF}
