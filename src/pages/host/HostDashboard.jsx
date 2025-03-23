@@ -23,29 +23,9 @@ import {
   setBatchID,
   setChallengeID,
   setQuestionID,
+  setSelectedTab,
 } from "../../redux/reducers/auth";
 import ContestSetup from "./ChallengeSetup";
-
-// const dummyBatchData = {
-//   batches: [
-//     {
-//       _id: "batch1",
-//       name: "Technical",
-//       description: "RB 2026 CSE All sections (6th sem)",
-//       startDate: "2025-03-08",
-//       quizs: [1, 2, 3],
-//       students: [1, 2, 3, 4, 5, 6, 7],
-//     },
-//     {
-//       _id: "batch2",
-//       name: "AI & ML",
-//       description: "RB 2026 CSE AI/ML Specialization",
-//       startDate: "2025-03-15",
-//       quizs: [1, 2, 3],
-//       students: [1, 2, 3, 4, 5, 6, 7],
-//     },
-//   ],
-// };
 
 function HostDashboard() {
   const dispatch = useDispatch();
@@ -57,9 +37,11 @@ function HostDashboard() {
 
   const { host } = useSelector((state) => state.auth);
 
-  const [selectedTab, setSelectedTab] = useState("contests");
+  // const [selectedTab, setSelectedTab] = useState("contests");
 
   const [currentDataToShow, setCurrentDataToShow] = useState([]);
+
+  const { selectedTab } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(setQuestionID(null));
@@ -71,13 +53,16 @@ function HostDashboard() {
   const { isLoading: batchesLoading, data: myBatchesData } =
     useMyBatchesQuery("");
 
-  useEffect(() => {
-    setCurrentDataToShow(
-      selectedTab === "contests"
-        ? myChallengesData?.challenges
-        : myBatchesData.batches
-    );
-  }, [selectedTab, myChallengesData, myBatchesData]);
+    useEffect(() => {
+      if (!challengeLoading && !batchesLoading) {
+        setCurrentDataToShow(
+          selectedTab === "contests"
+            ? myChallengesData?.challenges || []
+            : myBatchesData?.batches || []
+        );
+      }
+    }, [selectedTab, myChallengesData, myBatchesData, challengeLoading, batchesLoading]);
+    
 
   const [updateHost, { isLoading, isSuccess, data, isError, error }] =
     useUpdateHostMutation();
@@ -126,6 +111,11 @@ function HostDashboard() {
     error,
     successMessage: "Host updated successfully",
   });
+
+  if (challengeLoading || batchesLoading) {
+    return <LoadingSpinner />;
+  }
+  
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen relative">
@@ -205,10 +195,9 @@ function HostDashboard() {
                   participants' submissions and performance.
                 </p>
                 <button
-                  onClick={() => setSelectedTab("contests")}
+                  onClick={() => dispatch(setSelectedTab("contests"))}
                   className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-700 transition duration-200 w-full"
                 >
-                 
                   <a href="#preData"> Manage Challenges</a>
                 </button>
               </div>
@@ -226,7 +215,7 @@ function HostDashboard() {
                   participants' progress and results.
                 </p>
                 <button
-                  onClick={() => setSelectedTab("quizzes")}
+                  onClick={() => dispatch(setSelectedTab("quizzes"))}
                   className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-700 transition duration-200 w-full"
                 >
                   <a href="#preData">Manage Quizzes</a>
@@ -279,7 +268,7 @@ function HostDashboard() {
                   </div>
 
                   {/* Existing Challenges */}
-                  {currentDataToShow.map((challenge) => (
+                  {currentDataToShow?.map((challenge) => (
                     <div
                       key={challenge._id}
                       className="bg-gray-50 border border-indigo-200 rounded-lg shadow-sm p-4 hover:shadow-lg transition-shadow duration-300"
@@ -358,7 +347,7 @@ function HostDashboard() {
                     Create New Quiz Batch
                   </div>
 
-                  {currentDataToShow.map((batch) => (
+                  {currentDataToShow?.map((batch) => (
                     <div
                       key={batch._id}
                       className="bg-gray-50 border border-indigo-200 rounded-lg shadow-sm p-4 hover:shadow-lg transition-shadow duration-300"

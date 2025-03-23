@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  selectedTab: "contests",
   host: null,
   user: null,
   challengeID: null,
@@ -17,13 +18,16 @@ const initialState = {
   batchID: null,
   batch: null,
   quizID: null,
-  quiz: null
+  quiz: null,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    setSelectedTab: (state, action) => {
+      state.selectedTab = action.payload;
+    },
     hostLoading: (state) => {
       state.loading.host = true;
     },
@@ -81,6 +85,7 @@ const authSlice = createSlice({
 export default authSlice;
 
 export const {
+  setSelectedTab,
   hostLoading,
   hostExists,
   hostNotExists,
@@ -97,5 +102,5 @@ export const {
   setBatchID,
   setBatch,
   setQuizID,
-  setQuiz
+  setQuiz,
 } = authSlice.actions;
