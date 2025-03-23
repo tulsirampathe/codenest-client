@@ -190,43 +190,50 @@ const TotalStudents = ({ students }) => {
 // Add new QuizPerformance component
 const QuizPerformance = ({ id }) => {
   const [studentSearch, setStudentSearch] = useState("");
-  const [quizSearch, setQuizSearch] = useState("");
-
   const { data, isLoading } = useStudentQuizPerformanceQuery(id);
 
   if (isLoading) return <LoadingSpinner />;
 
-  // Ensure data is defined before filtering
-  const filteredData = data?.performanceData
-    ? data.performanceData.filter((entry) => {
-        const matchesStudent = entry.student
-          .toLowerCase()
-          .includes(studentSearch.toLowerCase());
-        const matchesQuiz = entry.quiz
-          .toLowerCase()
-          .includes(quizSearch.toLowerCase());
-        return matchesStudent && matchesQuiz;
-      })
-    : [];
+  // Group performance data by student
+  const groupedData = {};
+  data?.performanceData?.forEach((entry) => {
+    if (!groupedData[entry.student]) {
+      groupedData[entry.student] = {};
+    }
+    groupedData[entry.student][entry.quiz] = {
+      score: entry.score,
+      total: entry.total,
+      percentage:
+        entry.total > 0
+          ? ((entry.score / entry.total) * 100).toFixed(1) + "%"
+          : "0%",
+    };
+  });
 
-  // 📌 Function to Export Data to Excel
+  // Extract unique quiz names dynamically
+  const quizNames = [
+    ...new Set(data?.performanceData.map((entry) => entry.quiz)),
+  ];
+
+  // 📌 Export to Excel function
   const exportToExcel = () => {
-    if (filteredData.length === 0) {
+    const excelData = Object.keys(groupedData).map((student) => {
+      const rowData = { Student: student };
+      quizNames.forEach((quiz) => {
+        const performance = groupedData[student][quiz];
+        rowData[quiz] = performance
+          ? `${performance.score}/${performance.total} (${performance.percentage})`
+          : "—";
+      });
+      return rowData;
+    });
+
+    if (excelData.length === 0) {
       alert("No data available to export!");
       return;
     }
 
-    const worksheet = XLSX.utils.json_to_sheet(
-      filteredData.map((entry) => ({
-        Student: entry.student,
-        Quiz: entry.quiz,
-        Score: entry.score,
-        Total: entry.total,
-        Percentage: ((entry.score / entry.total) * 100).toFixed(1) + "%",
-        Date: moment(entry.date).format("DD MMM YYYY"),
-      }))
-    );
-
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Quiz Performance");
 
@@ -239,96 +246,71 @@ const QuizPerformance = ({ id }) => {
         Student Quiz Performance
       </h2>
 
-      {/* Search Controls */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6 p-4 bg-gray-50 rounded-lg shadow-sm">
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Search by Student:
-          </label>
-          <input
-            type="text"
-            placeholder="Enter student name..."
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            value={studentSearch}
-            onChange={(e) => setStudentSearch(e.target.value)}
-          />
-        </div>
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Search by Quiz:
-          </label>
-          <input
-            type="text"
-            placeholder="Enter quiz name..."
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            value={quizSearch}
-            onChange={(e) => setQuizSearch(e.target.value)}
-          />
-        </div>
+      {/* Search Bar */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by student name..."
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+          value={studentSearch}
+          onChange={(e) => setStudentSearch(e.target.value)}
+        />
       </div>
 
-      {/* Data Table */}
-      {filteredData.length === 0 ? (
-        <p className="text-gray-500 text-center">No matching records found.</p>
-      ) : (
-        <div className="overflow-hidden rounded-lg shadow-md border border-gray-300">
-          <div className="max-h-96 overflow-y-auto">
-            <table className="w-full border-collapse">
-              <thead className="sticky top-0 bg-blue-500 text-white uppercase text-sm font-semibold shadow-md">
-                <tr>
-                  <th className="p-4 border border-gray-300 text-center">
-                    Student
-                  </th>
-                  <th className="p-4 border border-gray-300 text-center">
-                    Quiz
-                  </th>
-                  <th className="p-4 border border-gray-300 text-center">
-                    Score
-                  </th>
-                  <th className="p-4 border border-gray-300 text-center">
-                    Total
-                  </th>
-                  <th className="p-4 border border-gray-300 text-center">
-                    Percentage
-                  </th>
-                  <th className="p-4 border border-gray-300 text-center">
-                    Date
-                  </th>
+      {/* Performance Table */}
+      <div className="overflow-x-auto rounded-lg shadow-md border border-gray-300">
+        <table className="w-full border-collapse">
+          <thead className="bg-blue-500 text-white uppercase text-sm font-semibold">
+            <tr>
+              <th className="p-4 border border-gray-300 text-center">
+                Student
+              </th>
+              {quizNames.map((quiz, index) => (
+                <th
+                  key={index}
+                  className="p-4 border border-gray-300 text-center"
+                >
+                  {quiz}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white">
+            {Object.keys(groupedData)
+              .filter((student) =>
+                student.toLowerCase().includes(studentSearch.toLowerCase())
+              )
+              .map((student, index) => (
+                <tr
+                  key={index}
+                  className="border border-gray-300 hover:bg-gray-100 transition-all"
+                >
+                  <td className="p-4 border border-gray-300 text-center font-semibold">
+                    {student}
+                  </td>
+                  {quizNames.map((quiz, idx) => {
+                    const performance = groupedData[student][quiz];
+                    return (
+                      <td
+                        key={idx}
+                        className="p-4 border border-gray-300 text-center"
+                      >
+                        {performance ? (
+                          <span className="font-bold">
+                            {performance.score}/{performance.total} (
+                            {performance.percentage})
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </td>
+                    );
+                  })}
                 </tr>
-              </thead>
-              <tbody className="bg-white">
-                {filteredData.map((entry, index) => (
-                  <tr
-                    key={index}
-                    className={`border border-gray-300 ${
-                      index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                    } hover:bg-gray-100 transition-all`}
-                  >
-                    <td className="p-4 border border-gray-300 text-center">
-                      {entry.student}
-                    </td>
-                    <td className="p-4 border border-gray-300 text-center">
-                      {entry.quiz}
-                    </td>
-                    <td className="p-4 border border-gray-300 text-center">
-                      {entry.score}
-                    </td>
-                    <td className="p-4 border border-gray-300 text-center">
-                      {entry.total}
-                    </td>
-                    <td className="p-4 border border-gray-300 text-center">
-                      {((entry.score / entry.total) * 100).toFixed(1)}%
-                    </td>
-                    <td className="p-4 border border-gray-300 text-center">
-                      {moment(entry.date).format("DD MMM YYYY")}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+              ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Excel Export Button */}
       <div className="relative group w-fit mx-auto mt-6">
