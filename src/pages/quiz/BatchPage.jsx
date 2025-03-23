@@ -194,7 +194,7 @@ const QuizPerformance = ({ id }) => {
 
   const { data, isLoading } = useStudentQuizPerformanceQuery(id);
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <LoadingSpinner />;
 
   // Ensure data is defined before filtering
   const filteredData = data?.performanceData
