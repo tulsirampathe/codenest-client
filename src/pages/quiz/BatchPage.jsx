@@ -3,7 +3,9 @@ import moment from "moment";
 import React, { useState } from "react";
 import {
   FaCalendarAlt,
+  FaChartLine,
   FaCheckCircle,
+  FaFileExcel,
   FaPlus,
   FaTasks,
   FaTimesCircle,
@@ -13,12 +15,14 @@ import {
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import BatchHeader from "../../components/quiz components/BatchHeader";
 import useMutationToast from "../../hooks/useMutationToast";
 import {
   useBatchDataQuery,
   useBatchReqestsMutation,
+  useStudentQuizPerformanceQuery,
 } from "../../redux/api/api";
 import { setQuizID } from "../../redux/reducers/auth";
 import ChallengeSetup from "../host/ChallengeSetup";
@@ -27,6 +31,7 @@ const sections = [
   { name: "Batch Quizzes", icon: <FaUserGraduate size={20} /> },
   { name: "Total Students", icon: <FaUsers size={20} /> },
   { name: "Pending Requests", icon: <FaUserPlus size={20} /> },
+  { name: "Quiz Performance", icon: <FaChartLine size={20} /> },
 ];
 
 const BatchSidebar = ({ activeSection, setActiveSection, sections }) => (
@@ -55,7 +60,7 @@ const BatchQuizzes = ({ quizzes, handleQuiz, handleCreateQuiz }) => {
   return (
     <div>
       {/* Title */}
-      <h2 className="text-2xl font-bold text-indigo-700 text-center mb-6">
+      <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
         Batch Quizzes
       </h2>
 
@@ -182,6 +187,168 @@ const TotalStudents = ({ students }) => {
   );
 };
 
+// Add new QuizPerformance component
+const QuizPerformance = ({ id }) => {
+  const [studentSearch, setStudentSearch] = useState("");
+  const [quizSearch, setQuizSearch] = useState("");
+
+  const { data, isLoading } = useStudentQuizPerformanceQuery(id);
+
+  if (isLoading) return <p>Loading...</p>;
+
+  // Ensure data is defined before filtering
+  const filteredData = data?.performanceData
+    ? data.performanceData.filter((entry) => {
+        const matchesStudent = entry.student
+          .toLowerCase()
+          .includes(studentSearch.toLowerCase());
+        const matchesQuiz = entry.quiz
+          .toLowerCase()
+          .includes(quizSearch.toLowerCase());
+        return matchesStudent && matchesQuiz;
+      })
+    : [];
+
+  // 📌 Function to Export Data to Excel
+  const exportToExcel = () => {
+    if (filteredData.length === 0) {
+      alert("No data available to export!");
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(
+      filteredData.map((entry) => ({
+        Student: entry.student,
+        Quiz: entry.quiz,
+        Score: entry.score,
+        Total: entry.total,
+        Percentage: ((entry.score / entry.total) * 100).toFixed(1) + "%",
+        Date: moment(entry.date).format("DD MMM YYYY"),
+      }))
+    );
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Quiz Performance");
+
+    XLSX.writeFile(workbook, "Quiz_Performance.xlsx");
+  };
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">
+        Student Quiz Performance
+      </h2>
+
+      {/* Search Controls */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6 p-4 bg-gray-50 rounded-lg shadow-sm">
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Search by Student:
+          </label>
+          <input
+            type="text"
+            placeholder="Enter student name..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            value={studentSearch}
+            onChange={(e) => setStudentSearch(e.target.value)}
+          />
+        </div>
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Search by Quiz:
+          </label>
+          <input
+            type="text"
+            placeholder="Enter quiz name..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            value={quizSearch}
+            onChange={(e) => setQuizSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Data Table */}
+      {filteredData.length === 0 ? (
+        <p className="text-gray-500 text-center">No matching records found.</p>
+      ) : (
+        <div className="overflow-hidden rounded-lg shadow-md border border-gray-300">
+          <div className="max-h-96 overflow-y-auto">
+            <table className="w-full border-collapse">
+              <thead className="sticky top-0 bg-blue-500 text-white uppercase text-sm font-semibold shadow-md">
+                <tr>
+                  <th className="p-4 border border-gray-300 text-center">
+                    Student
+                  </th>
+                  <th className="p-4 border border-gray-300 text-center">
+                    Quiz
+                  </th>
+                  <th className="p-4 border border-gray-300 text-center">
+                    Score
+                  </th>
+                  <th className="p-4 border border-gray-300 text-center">
+                    Total
+                  </th>
+                  <th className="p-4 border border-gray-300 text-center">
+                    Percentage
+                  </th>
+                  <th className="p-4 border border-gray-300 text-center">
+                    Date
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white">
+                {filteredData.map((entry, index) => (
+                  <tr
+                    key={index}
+                    className={`border border-gray-300 ${
+                      index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                    } hover:bg-gray-100 transition-all`}
+                  >
+                    <td className="p-4 border border-gray-300 text-center">
+                      {entry.student}
+                    </td>
+                    <td className="p-4 border border-gray-300 text-center">
+                      {entry.quiz}
+                    </td>
+                    <td className="p-4 border border-gray-300 text-center">
+                      {entry.score}
+                    </td>
+                    <td className="p-4 border border-gray-300 text-center">
+                      {entry.total}
+                    </td>
+                    <td className="p-4 border border-gray-300 text-center">
+                      {((entry.score / entry.total) * 100).toFixed(1)}%
+                    </td>
+                    <td className="p-4 border border-gray-300 text-center">
+                      {moment(entry.date).format("DD MMM YYYY")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Excel Export Button */}
+      <div className="relative group w-fit mx-auto mt-6">
+        <button
+          onClick={exportToExcel}
+          className="bg-green-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-green-700 transition transform hover:scale-105 focus:outline-none flex items-center gap-2"
+        >
+          <FaFileExcel className="w-5 h-5" />
+          <span>Export as Excel</span>
+        </button>
+
+        {/* Tooltip */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 -top-12 bg-black text-white text-sm px-3 py-1 rounded-md opacity-0 group-hover:opacity-100 transition duration-200 whitespace-nowrap">
+          Download student quiz data as an Excel file 📊
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const PendingRequests = ({ pendingRequests, onBatchRequest }) => {
   return (
     <div>
@@ -259,7 +426,9 @@ function BatchPage() {
 
   const { batchID } = useSelector((state) => state.auth);
 
-  const { data, isLoading: isBatchLoding } = useBatchDataQuery({batchId: batchID});
+  const { data, isLoading: isBatchLoding } = useBatchDataQuery({
+    batchId: batchID,
+  });
 
   const batchData = data?.batch;
 
@@ -326,6 +495,10 @@ function BatchPage() {
               pendingRequests={batchData.pendingRequests}
               onBatchRequest={handleBatchRequest}
             />
+          )}
+          {/* Add new section */}
+          {activeSection === "Quiz Performance" && (
+            <QuizPerformance id={batchID} />
           )}
         </div>
       </div>

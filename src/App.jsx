@@ -43,6 +43,7 @@ import StudentBatchPage from "./components/UserQuiz/StudentBatchPage";
 import AddQuizQuestion from "./pages/quiz/AddQuizQuetion";
 import BatchPage from "./pages/quiz/BatchPage";
 import WordQuizImporter from "./shared/WordQuizImporter";
+import QuizResults from "./pages/quiz/QuizResults";
 
 function App() {
   const { host, loading, user, challengeProgress } = useSelector(
@@ -134,6 +135,7 @@ function App() {
             />
             <Route path="/user/quiz/dashboard" element={<StudentBatchPage />} />
             <Route path="/user/batch" element={<BatchDetailsPage />} />
+            <Route path="/user/quiz/result" element={<QuizResults />} />
           </Route>
             <Route path="/user/quiz" element={<MainQuiz />} />
           <Route path="/editor" element={<MainCode />} />

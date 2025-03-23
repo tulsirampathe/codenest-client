@@ -295,6 +295,13 @@ const api = createApi({
       providesTags: ["Batch"],
     }),
 
+    studentQuizPerformance: builder.query({
+      query: (id) => ({
+        url: `api/batches/${id}/performance`, 
+        credentials: "include",
+      })
+    }),
+
     // Edit batch data
     editBtachData: builder.mutation({
       query: ({ id, data }) => ({
@@ -326,6 +333,7 @@ const api = createApi({
       }),
       invalidatesTags: ["Batch"],
     }),
+
     quizData: builder.query({
       query: (id) => ({
         url: `api/quizzes/${id}`,
@@ -492,4 +500,5 @@ export const {
   useSubmitQuizQuestionMutation,
   useGetUserQuizSubmissionQuery,
   useQuizInitializeMutation,
+  useStudentQuizPerformanceQuery
 } = api;

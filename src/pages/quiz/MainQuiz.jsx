@@ -7,7 +7,6 @@ import {
   FiChevronRight,
   FiClock,
 } from "react-icons/fi";
-import { MdCheckCircle, MdHome } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../components/LoadingSpinner";
@@ -17,6 +16,7 @@ import {
   useSubmitQuizQuestionMutation,
 } from "../../redux/api/api";
 import { setQuizID } from "../../redux/reducers/auth";
+import QuizResults from "./QuizResults";
 
 function MainQuiz() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -187,38 +187,7 @@ function MainQuiz() {
   }
 
   if (quizSubmitted) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-6">
-        <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full text-center shadow-lg">
-          <MdCheckCircle className="text-5xl text-green-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-semibold mb-4">Quiz Completed</h1>
-          <p className="text-gray-400 text-sm mb-6">
-            You have successfully completed the quiz. Here are your results:
-          </p>
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-gray-700 p-4 rounded-md">
-              <p className="text-xl font-semibold text-blue-400">
-                {userQuizAnswers?.submission?.totalScore}
-              </p>
-              <p className="text-gray-400 text-xs mt-1">Total Score</p>
-            </div>
-            <div className="bg-gray-700 p-4 rounded-md">
-              <p className="text-xl font-semibold text-green-400">
-                {Object.keys(selectedAnswers).length}/
-                {quizData?.questions.length}
-              </p>
-              <p className="text-gray-400 text-xs mt-1">Questions Answered</p>
-            </div>
-          </div>
-          <button
-            onClick={() => navigate("/user/quiz/dashboard")}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium flex items-center justify-center gap-2 mx-auto transition"
-          >
-            <MdHome className="text-lg" /> Back to Home
-          </button>
-        </div>
-      </div>
-    );
+    return <QuizResults submission={userQuizAnswers?.submission} />;
   }
 
   return (
@@ -226,28 +195,30 @@ function MainQuiz() {
       ref={quizRef}
       className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8"
     >
-     {showFullscreenPrompt && (
-  <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-80">
-    <div className="bg-gray-800 p-8 rounded-lg text-center max-w-96 w-full mx-4">
-      <h1 className="text-2xl font-bold mb-4 text-white">
-        Fullscreen Required
-      </h1>
-      <p className="text-gray-400 mb-6">
-        For a secure and distraction-free experience, please enter fullscreen mode. Exiting fullscreen will automatically submit your quiz.
-      </p>
-      <button
-        onClick={handleStartFullscreen}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 mx-auto"
-      >
-        <FiChevronRight className="text-xl" /> Enter Fullscreen
-      </button>
-      <p className="text-sm text-gray-500 mt-6">
-        Note: Exiting fullscreen during the quiz will submit your answers automatically.
-      </p>
-    </div>
-  </div>
-)}
-
+      {showFullscreenPrompt && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-80">
+          <div className="bg-gray-800 p-8 rounded-lg text-center max-w-96 w-full mx-4">
+            <h1 className="text-2xl font-bold mb-4 text-white">
+              Fullscreen Required
+            </h1>
+            <p className="text-gray-400 mb-6">
+              For a secure and distraction-free experience, please enter
+              fullscreen mode. Exiting fullscreen will automatically submit your
+              quiz.
+            </p>
+            <button
+              onClick={handleStartFullscreen}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 mx-auto"
+            >
+              <FiChevronRight className="text-xl" /> Enter Fullscreen
+            </button>
+            <p className="text-sm text-gray-500 mt-6">
+              Note: Exiting fullscreen during the quiz will submit your answers
+              automatically.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Main Quiz Content Here */}
       <div className="max-w-6xl mx-auto">
