@@ -68,7 +68,8 @@ function MainQuiz() {
   const { data: userQuizAnswers, isLoading: isQuizAnswersLoading } =
     useGetUserQuizSubmissionQuery({ userId: user?._id, quizId: quizID });
 
-  const [submitQuizQuestion] = useSubmitQuizQuestionMutation();
+  const [submitQuizQuestion, { isLoading: isSubmitLoading }] =
+    useSubmitQuizQuestionMutation();
 
   // Initialize `timeRemaining` from quiz start & end time
   useEffect(() => {
@@ -79,20 +80,6 @@ function MainQuiz() {
       setTimeRemaining(durationSeconds > 0 ? durationSeconds : 0);
     }
   }, [quizData?.startTime, quizData?.endTime]);
-
-  // Adjust `timeRemaining` based on user's previous progress
-  useEffect(() => {
-    if (userQuizAnswers?.submission?.answers) {
-      setSelectedAnswers(userQuizAnswers.submission.answers);
-
-      // Update timeSpent with the time taken from the server
-      const newTimeSpent = {};
-      userQuizAnswers.submission.answers.forEach((answer) => {
-        newTimeSpent[answer.question._id] = answer.timeTaken / 1000; // Convert ms to sec
-      });
-      setTimeSpent(newTimeSpent);
-    }
-  }, [userQuizAnswers]);
 
   // Timer for quiz countdown
   useEffect(() => {
@@ -143,15 +130,29 @@ function MainQuiz() {
 
   const handleAnswerSelect = (questionId, optionIndex) => {
     const timeTaken = timeSpent[questionId] || 0;
-    submitQuizQuestion({
-      quizId: quizID,
-      questionId: questionId,
-      selectedOption: optionIndex,
-      timeTaken: timeTaken * 1000, // Convert seconds to milliseconds
-    });
+
+    setSelectedAnswers((prev) => ({
+      ...prev,
+      [questionId]: {
+        selectedOption: optionIndex,
+        timeTaken: timeTaken * 1000, // store in ms
+      },
+    }));
   };
 
   const handleQuizSubmit = () => {
+    const submissions = Object.entries(selectedAnswers).map(
+      ([questionId, data]) => ({
+        questionId,
+        selectedOption: data.selectedOption,
+        timeTaken: data.timeTaken,
+      })
+    );
+
+    submitQuizQuestion({
+      quizId: quizID,
+      submissions,
+    });
     dispatch(setQuizID(null));
     setQuizSubmitted(true);
   };
@@ -182,7 +183,7 @@ function MainQuiz() {
     }
   };
 
-  if (isQuizLoading || !quizData || isQuizAnswersLoading) {
+  if (isQuizLoading || !quizData || isQuizAnswersLoading || isSubmitLoading) {
     return <LoadingSpinner />;
   }
 
@@ -273,13 +274,10 @@ function MainQuiz() {
             </h2>
             <div className="space-y-2 mb-12">
               {shuffledOptions.map(({ option, originalIndex }) => {
+                const selectedAnswer = selectedAnswers[currentQuestion._id];
                 const isSelected =
-                  Array.isArray(selectedAnswers) &&
-                  selectedAnswers.some(
-                    (ans) =>
-                      ans.question._id === currentQuestion._id &&
-                      ans.selectedOption === originalIndex
-                  );
+                  selectedAnswer?.selectedOption === originalIndex;
+
                 return (
                   <button
                     key={originalIndex}
@@ -294,12 +292,12 @@ function MainQuiz() {
                   >
                     <div
                       className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        isSelected ? "bg-blue-500" : "bg-gray-600"
+                        isSelected ? "bg-blue-500 text-white" : "bg-gray-600"
                       }`}
                     >
-                      {isSelected && <FiCheck className="text-white text-lg" />}
+                      {isSelected && <FiCheck />}
                     </div>
-                    <span className="text-lg">{option}</span>
+                    <span>{option}</span>
                   </button>
                 );
               })}
