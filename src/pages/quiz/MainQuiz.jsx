@@ -26,6 +26,8 @@ function MainQuiz() {
   const [timeSpent, setTimeSpent] = useState({});
   const [shuffledOptions, setShuffledOptions] = useState([]);
   const [showFullscreenPrompt, setShowFullscreenPrompt] = useState(true);
+  const [shuffledMap, setShuffledMap] = useState({});
+
   const intervalRef = useRef(null);
   const quizRef = useRef(null);
 
@@ -68,8 +70,7 @@ function MainQuiz() {
   const { data: userQuizAnswers, isLoading: isQuizAnswersLoading } =
     useGetUserQuizSubmissionQuery({ userId: user?._id, quizId: quizID });
 
-  const [submitQuizQuestion, { isLoading: isSubmitLoading }] =
-    useSubmitQuizQuestionMutation();
+  const [submitQuizQuestion] = useSubmitQuizQuestionMutation();
 
   // Initialize `timeRemaining` from quiz start & end time
   useEffect(() => {
@@ -80,6 +81,20 @@ function MainQuiz() {
       setTimeRemaining(durationSeconds > 0 ? durationSeconds : 0);
     }
   }, [quizData?.startTime, quizData?.endTime]);
+
+  // Adjust `timeRemaining` based on user's previous progress
+  useEffect(() => {
+    if (userQuizAnswers?.submission?.answers) {
+      setSelectedAnswers(userQuizAnswers.submission.answers);
+
+      // Update timeSpent with the time taken from the server
+      const newTimeSpent = {};
+      userQuizAnswers.submission.answers.forEach((answer) => {
+        newTimeSpent[answer.question._id] = answer.timeTaken / 1000; // Convert ms to sec
+      });
+      setTimeSpent(newTimeSpent);
+    }
+  }, [userQuizAnswers]);
 
   // Timer for quiz countdown
   useEffect(() => {
@@ -110,49 +125,50 @@ function MainQuiz() {
 
   // Shuffle options when current question changes
   useEffect(() => {
-    if (currentQuestion?.options) {
-      const indexedOptions = currentQuestion.options.map((option, index) => ({
-        option,
-        originalIndex: index, // Store original index for correct answer mapping
-      }));
-
-      // Fisher-Yates shuffle
-      for (let i = indexedOptions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [indexedOptions[i], indexedOptions[j]] = [
-          indexedOptions[j],
-          indexedOptions[i],
-        ];
+    if (currentQuestion?._id && currentQuestion?.options) {
+      const questionId = currentQuestion._id;
+  
+      // If already shuffled, don't reshuffle
+      if (shuffledMap[questionId]) {
+        setShuffledOptions(shuffledMap[questionId]);
+      } else {
+        const indexedOptions = currentQuestion.options.map((option, index) => ({
+          option,
+          originalIndex: index,
+        }));
+  
+        // Shuffle (Fisher-Yates)
+        for (let i = indexedOptions.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [indexedOptions[i], indexedOptions[j]] = [
+            indexedOptions[j],
+            indexedOptions[i],
+          ];
+        }
+  
+        // Save to map
+        setShuffledMap((prev) => ({
+          ...prev,
+          [questionId]: indexedOptions,
+        }));
+  
+        setShuffledOptions(indexedOptions);
       }
-      setShuffledOptions(indexedOptions);
     }
   }, [currentQuestion]);
+  
 
   const handleAnswerSelect = (questionId, optionIndex) => {
     const timeTaken = timeSpent[questionId] || 0;
-
-    setSelectedAnswers((prev) => ({
-      ...prev,
-      [questionId]: {
-        selectedOption: optionIndex,
-        timeTaken: timeTaken * 1000, // store in ms
-      },
-    }));
+    submitQuizQuestion({
+      quizId: quizID,
+      questionId: questionId,
+      selectedOption: optionIndex,
+      timeTaken: timeTaken * 1000, // Convert seconds to milliseconds
+    });
   };
 
   const handleQuizSubmit = () => {
-    const submissions = Object.entries(selectedAnswers).map(
-      ([questionId, data]) => ({
-        questionId,
-        selectedOption: data.selectedOption,
-        timeTaken: data.timeTaken,
-      })
-    );
-
-    submitQuizQuestion({
-      quizId: quizID,
-      submissions,
-    });
     dispatch(setQuizID(null));
     setQuizSubmitted(true);
   };
@@ -183,7 +199,7 @@ function MainQuiz() {
     }
   };
 
-  if (isQuizLoading || !quizData || isQuizAnswersLoading || isSubmitLoading) {
+  if (isQuizLoading || !quizData || isQuizAnswersLoading) {
     return <LoadingSpinner />;
   }
 
@@ -274,10 +290,13 @@ function MainQuiz() {
             </h2>
             <div className="space-y-2 mb-12">
               {shuffledOptions.map(({ option, originalIndex }) => {
-                const selectedAnswer = selectedAnswers[currentQuestion._id];
                 const isSelected =
-                  selectedAnswer?.selectedOption === originalIndex;
-
+                  Array.isArray(selectedAnswers) &&
+                  selectedAnswers.some(
+                    (ans) =>
+                      ans.question._id === currentQuestion._id &&
+                      ans.selectedOption === originalIndex
+                  );
                 return (
                   <button
                     key={originalIndex}
@@ -292,12 +311,12 @@ function MainQuiz() {
                   >
                     <div
                       className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        isSelected ? "bg-blue-500 text-white" : "bg-gray-600"
+                        isSelected ? "bg-blue-500" : "bg-gray-600"
                       }`}
                     >
-                      {isSelected && <FiCheck />}
+                      {isSelected && <FiCheck className="text-white text-lg" />}
                     </div>
-                    <span>{option}</span>
+                    <span className="text-lg">{option}</span>
                   </button>
                 );
               })}
