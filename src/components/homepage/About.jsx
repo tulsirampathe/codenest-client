@@ -2,120 +2,66 @@ import React from "react";
 
 const About = () => {
   return (
-    <div className="min-h-screen pt-24 pb-8 px-8 bg-gradient-to-b from-gray-900 via-black to-gray-950 text-gray-300">
+    <div className="min-h-screen pt-24 pb-12 px-6 sm:px-12 bg-gray-950 text-gray-200 font-inter">
       {/* Hero Section */}
-      <section className="mb-12 text-center animate-fadeIn">
-        <h1 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-blue-500 to-purple-600 drop-shadow-lg mb-4">
-          Welcome to Codenest
+      <section className="text-center mb-16">
+        <h1 className="text-4xl sm:text-6xl font-extrabold bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-600 bg-clip-text text-transparent mb-4">
+          About CodeNest
         </h1>
-        <p className="text-xl text-gray-400 max-w-4xl mx-auto">
-          Your go-to platform for competitive <span className="text-teal-400 font-semibold">Coding Contests</span> and engaging <span className="text-yellow-400 font-semibold">Quizzes</span>.  
-          Whether you're a student looking to sharpen your coding skills or an educator streamlining assessments, **Codenest** has you covered.
+        <p className="text-lg sm:text-xl max-w-3xl mx-auto text-gray-400">
+          A modern, free-to-use coding and assessment platform tailored for colleges. Built to simplify the way educators conduct coding contests and quizzes, and help students sharpen their skills in an engaging environment.
         </p>
       </section>
 
-      {/* Features Section */}
-      <section className="my-12">
-        <h2 className="text-4xl font-semibold text-white text-center mb-6">
-          What We Offer
-        </h2>
+      {/* Why We Built CodeNest */}
+      <section className="mb-20">
+        <h2 className="text-3xl font-semibold text-center mb-6">Why CodeNest?</h2>
+        <p className="text-gray-400 max-w-4xl mx-auto text-center text-lg leading-relaxed">
+          Students often lack affordable, curriculum-integrated platforms to practice coding and test conceptual understanding. At the same time, teachers face challenges in organizing contests and quizzes while tracking student performance effectively. <span className="text-cyan-400 font-medium">CodeNest bridges this gap</span> with a dedicated solution for both.
+        </p>
+      </section>
 
+      {/* What We Offer */}
+      <section className="mb-20">
+        <h2 className="text-3xl font-semibold text-center mb-10">What CodeNest Offers</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Coding Contests */}
-          <div className="bg-gray-800 p-8 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 hover:bg-gray-700">
-            <h3 className="text-3xl font-bold text-teal-400 mb-4">
-              💻 Coding Contests
-            </h3>
-            <p className="text-lg text-gray-400 leading-relaxed">
-              Compete with programmers worldwide, challenge yourself with  
-              real-world problems, and improve your coding skills in a timed  
-              environment. Earn rankings and showcase your expertise!
-            </p>
+          <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-cyan-500 transition">
+            <h3 className="text-2xl font-semibold text-cyan-400 mb-3">💻 For Students</h3>
+            <ul className="text-gray-400 list-disc list-inside space-y-2">
+              <li>Participate in real-time coding contests</li>
+              <li>Access quizzes within your batch</li>
+              <li>Get ranked and track your coding growth</li>
+              <li>Solve challenges using an intuitive code editor</li>
+            </ul>
           </div>
 
-          {/* Quizzes */}
-          <div className="bg-gray-800 p-8 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 hover:bg-gray-700">
-            <h3 className="text-3xl font-bold text-yellow-400 mb-4">
-              📝 Interactive Quizzes
-            </h3>
-            <p className="text-lg text-gray-400 leading-relaxed">
-              Test your conceptual knowledge with our **quiz feature**.  
-              Get instant feedback, track your progress, and reinforce  
-              your learning with fun, engaging questions!
-            </p>
+          <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-yellow-500 transition">
+            <h3 className="text-2xl font-semibold text-yellow-400 mb-3">🧑‍🏫 For Educators</h3>
+            <ul className="text-gray-400 list-disc list-inside space-y-2">
+              <li>Create and manage coding contests & test cases</li>
+              <li>Assign quizzes to batches of students</li>
+              <li>Monitor student performance with leaderboards</li>
+              <li>Use a dedicated platform without any cost</li>
+            </ul>
           </div>
         </div>
       </section>
 
-      {/* Project Description */}
-      <section className="my-12 bg-gray-800 bg-opacity-50 p-8 rounded-lg animate-fadeIn">
-        <h2 className="text-4xl font-semibold text-white mb-4">About Codenest</h2>
-        <p className="text-lg leading-relaxed text-gray-400">
-          Codenest is a web-based platform designed to **simplify coding  
-          assessments** and enhance learning through challenges. Our platform  
-          helps educators manage and evaluate coding exams while giving  
-          students a fun, engaging space to practice their skills.
-        </p>
-      </section>
-
-      {/* Key Features */}
-      <section className="my-12">
-        <h2 className="text-4xl font-semibold text-white text-center mb-6">
-          Why Choose Codenest?
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="bg-gray-700 p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-300 hover:bg-gray-600">
-            <h3 className="text-2xl font-semibold text-teal-400 mb-2">
-              ⚡ Instant Feedback
-            </h3>
-            <p className="text-lg text-gray-300">
-              Get real-time results and insights to improve your performance.
-            </p>
+      {/* Platform Highlights */}
+      <section className="mb-20">
+        <h2 className="text-3xl font-semibold text-center mb-10">Why Choose CodeNest?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:shadow-md transition">
+            <h3 className="text-xl font-medium text-teal-300 mb-2">✅ Completely Free</h3>
+            <p className="text-gray-400">Unlike other platforms, CodeNest is 100% free for both students and teachers.</p>
           </div>
-          <div className="bg-gray-700 p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-300 hover:bg-gray-600">
-            <h3 className="text-2xl font-semibold text-yellow-400 mb-2">
-              📊 Track Your Progress
-            </h3>
-            <p className="text-lg text-gray-300">
-              Monitor your learning journey with detailed analytics.
-            </p>
+          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:shadow-md transition">
+            <h3 className="text-xl font-medium text-indigo-300 mb-2">🎯 Academic-Focused</h3>
+            <p className="text-gray-400">Designed specifically for college use with batch-wise assessments and user-friendly tools.</p>
           </div>
-          <div className="bg-gray-700 p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-300 hover:bg-gray-600">
-            <h3 className="text-2xl font-semibold text-purple-400 mb-2">
-              🎯 Fun & Competitive
-            </h3>
-            <p className="text-lg text-gray-300">
-              Challenge yourself, compete, and climb the leaderboard!
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="my-12 px-8 py-6 bg-gray-800 rounded-lg shadow-lg animate-fadeIn">
-        <h2 className="text-4xl font-semibold text-gray-300 mb-6 text-center">
-          What Users Are Saying
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-gray-700 p-6 shadow-md rounded-lg transition-transform transform hover:scale-105 hover:bg-gray-600">
-            <p className="text-lg text-gray-300">
-              "Codenest has completely transformed the way we conduct our coding assessments.  
-              It's intuitive and saves so much time!"
-            </p>
-            <p className="text-right font-semibold mt-2 text-yellow-400">
-              - XYZ, Educator
-            </p>
-          </div>
-          <div className="bg-gray-700 p-6 shadow-md rounded-lg transition-transform transform hover:scale-105 hover:bg-gray-600">
-            <p className="text-lg text-gray-300">
-              "As a student, I love how easy it is to navigate the tests on Codenest.  
-              It takes the stress out of coding exams!"
-            </p>
-            <p className="text-right font-semibold mt-2 text-yellow-400">
-              - Pawan Tiwari, Student
-            </p>
+          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:shadow-md transition">
+            <h3 className="text-xl font-medium text-purple-300 mb-2">🚀 Modern Experience</h3>
+            <p className="text-gray-400">Fast, responsive UI with an interactive code editor and smooth navigation.</p>
           </div>
         </div>
       </section>

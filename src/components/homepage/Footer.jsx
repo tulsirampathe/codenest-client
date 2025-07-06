@@ -41,23 +41,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Newsletter Subscription */}
-        <div className="bg-gray-800 p-6 rounded-md mt-10">
-          <h3 className="text-xl font-semibold mb-4">Subscribe to Our Newsletter</h3>
-          <p className="text-sm mb-4">Get the latest updates on coding resources, new courses, and more. Join our community today!</p>
-          
-          {/* Add gap-4 to create space between input and button */}
-          <div className="flex flex-col md:flex-row items-center md:gap-4">
-            <input
-              type="email"
-              className="bg-gray-700 text-white px-4 py-2 rounded-md mb-4 md:mb-0 md:w-2/3"
-              placeholder="Enter your email"
-            />
-            <button className="bg-yellow-500 text-white font-semibold px-6 py-2 rounded-md hover:bg-yellow-600">
-              Subscribe
-            </button>
-          </div>
-        </div>
 
         {/* Footer Bottom */}
         <div className="mt-12 border-t border-gray-700 pt-6">

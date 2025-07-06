@@ -31,7 +31,7 @@ const QuizResults = ({ submission }) => {
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-gray-700 p-4 rounded-md">
             <p className="text-xl font-semibold text-blue-400">
-              {submission.totalScore}
+              {submission.totalScore}/{submission?.quiz?.totalMarks}
             </p>
             <p className="text-gray-400 text-xs mt-1">Total Score</p>
           </div>
@@ -42,13 +42,6 @@ const QuizResults = ({ submission }) => {
             <p className="text-gray-400 text-xs mt-1">Questions Answered</p>
           </div>
         </div>
-{/* 
-        <p className="text-gray-400 text-sm">
-          Total Time Taken:{" "}
-          <span className="text-blue-400">
-            {submission.totalTimeTaken / 1000} sec
-          </span>
-        </p> */}
       </div>
 
       {/* Buttons Section */}

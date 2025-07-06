@@ -19,7 +19,7 @@ function NotProtectedLayout() {
       </div>
 
       {/* Additional Sections */}
-      <Features />
+      {/* <Features /> */}
       <Team />
       <Footer />
     </div>

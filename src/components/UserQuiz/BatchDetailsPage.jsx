@@ -267,7 +267,9 @@ const BatchDetailsPage = () => {
                 title="Completed Quizzes"
                 status="completed"
                 color="red"
-                quizzes={quizzes.filter((q) => q.status === "completed")}
+                quizzes={quizzes
+                  .filter((q) => q.status === "completed")
+                  .sort((a, b) => new Date(b.endTime) - new Date(a.endTime))}
               />
             </div>
           </div>
